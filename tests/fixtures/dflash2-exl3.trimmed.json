@@ -1,0 +1,106 @@
+{
+ "quant_method": "exl3",
+ "version": "1.5.0",
+ "bits": 4.0,
+ "head_bits": 6,
+ "calibration": {
+  "rows": 250,
+  "cols": 2048
+ },
+ "out_scales": "always",
+ "codebook": "mul1",
+ "tensor_storage": {
+  "fc": {
+   "stored_tensors": {
+    "fc.suh": {
+     "shape": [
+      25600
+     ],
+     "n_bytes": 51200,
+     "dtype": "torch.float16"
+    },
+    "fc.svh": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.float16"
+    },
+    "fc.mul1": {
+     "shape": [],
+     "n_bytes": 4,
+     "dtype": "torch.int32"
+    },
+    "fc.trellis": {
+     "shape": [
+      1600,
+      320,
+      64
+     ],
+     "n_bytes": 65536000,
+     "dtype": "torch.int16"
+    }
+   },
+   "quant_format": "exl3",
+   "bits_per_weight": 4,
+   "mul1_multiplier": 2212286765
+  },
+  "hidden_norm": {
+   "stored_tensors": {
+    "hidden_norm.weight": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.bfloat16"
+    }
+   }
+  },
+  "layers.0.input_layernorm": {
+   "stored_tensors": {
+    "layers.0.input_layernorm.weight": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.bfloat16"
+    }
+   }
+  },
+  "layers.0.self_attn.q_proj": {
+   "stored_tensors": {
+    "layers.0.self_attn.q_proj.suh": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.float16"
+    },
+    "layers.0.self_attn.q_proj.svh": {
+     "shape": [
+      4096
+     ],
+     "n_bytes": 8192,
+     "dtype": "torch.float16"
+    },
+    "layers.0.self_attn.q_proj.mul1": {
+     "shape": [],
+     "n_bytes": 4,
+     "dtype": "torch.int32"
+    },
+    "layers.0.self_attn.q_proj.trellis": {
+     "shape": [
+      320,
+      256,
+      64
+     ],
+     "n_bytes": 10485760,
+     "dtype": "torch.int16"
+    }
+   },
+   "quant_format": "exl3",
+   "bits_per_weight": 4,
+   "mul1_multiplier": 2212286765
+  }
+ }
+}

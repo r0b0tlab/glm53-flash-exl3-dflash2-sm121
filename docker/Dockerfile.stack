@@ -1,0 +1,29 @@
+# Container template. Digest pinning happens at first cluster build; the base
+# must be an ARM64 vLLM/CUDA 13 image with sm_121 support (house pattern:
+# vllm/vllm-openai@sha256:... arm64, as used by glm53-flash-nvfp4-sm121).
+ARG BASE_IMAGE="vllm/vllm-openai:PLACEHOLDER-PIN-ON-CLUSTER"
+FROM ${BASE_IMAGE}
+
+ARG VLLM_COMMIT
+ARG EXL3_COMMIT
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    TORCH_CUDA_ARCH_LIST="12.0;12.1" \
+    UV_PYTHON_INSTALL_DIR=/opt/uv-python
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git build-essential cmake ninja-build && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/vllm-exl3-sm121
+COPY . .
+
+# Build the plugin + extension against the image's vLLM/torch.
+RUN python -m pip install -e . && \
+    TORCH_CUDA_ARCH_LIST="12.0;12.1" python csrc/setup_ext.py build_ext --inplace
+
+# Non-root smoke (must run as the final user, not root).
+RUN useradd -m runner && chown -R runner /opt/vllm-exl3-sm121
+USER runner
+RUN python -m pytest tests -q && python -c "from vllm_exl3_sm121 import kernels; print(kernels.probe())"
+
+ENTRYPOINT ["python", "-m", "vllm.entrypoints.openai.api_server"]

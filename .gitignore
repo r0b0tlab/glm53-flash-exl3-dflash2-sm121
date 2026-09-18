@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+work/
+*.safetensors
+*.bin
+!tests/fixtures/*.json
+.DS_Store

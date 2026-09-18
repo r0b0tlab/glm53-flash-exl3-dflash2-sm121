@@ -1,0 +1,179 @@
+{
+ "quant_method": "exl3",
+ "version": "1.5.0",
+ "bits": 4.0,
+ "head_bits": 6,
+ "calibration": {
+  "rows": 250,
+  "cols": 2048
+ },
+ "out_scales": "always",
+ "codebook": "mul1",
+ "vision_bits": 6,
+ "mtp_bits": 4,
+ "tensor_storage": {
+  "model.language_model.embed_tokens": {
+   "stored_tensors": {
+    "model.language_model.embed_tokens.weight": {
+     "shape": [
+      248320,
+      5120
+     ],
+     "n_bytes": 2542796800,
+     "dtype": "torch.bfloat16"
+    }
+   }
+  },
+  "model.language_model.layers.0.input_layernorm": {
+   "stored_tensors": {
+    "model.language_model.layers.0.input_layernorm.weight": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.bfloat16"
+    }
+   }
+  },
+  "model.language_model.layers.0.linear_attn.in_proj_qkv": {
+   "stored_tensors": {
+    "model.language_model.layers.0.linear_attn.in_proj_qkv.suh": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.float16"
+    },
+    "model.language_model.layers.0.linear_attn.in_proj_qkv.svh": {
+     "shape": [
+      10240
+     ],
+     "n_bytes": 20480,
+     "dtype": "torch.float16"
+    },
+    "model.language_model.layers.0.linear_attn.in_proj_qkv.mul1": {
+     "shape": [],
+     "n_bytes": 4,
+     "dtype": "torch.int32"
+    },
+    "model.language_model.layers.0.linear_attn.in_proj_qkv.trellis": {
+     "shape": [
+      320,
+      640,
+      64
+     ],
+     "n_bytes": 26214400,
+     "dtype": "torch.int16"
+    }
+   },
+   "quant_format": "exl3",
+   "bits_per_weight": 4,
+   "mul1_multiplier": 2212286765
+  },
+  "model.language_model.layers.0.linear_attn.in_proj_z": {
+   "stored_tensors": {
+    "model.language_model.layers.0.linear_attn.in_proj_z.suh": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.float16"
+    },
+    "model.language_model.layers.0.linear_attn.in_proj_z.svh": {
+     "shape": [
+      6144
+     ],
+     "n_bytes": 12288,
+     "dtype": "torch.float16"
+    },
+    "model.language_model.layers.0.linear_attn.in_proj_z.mul1": {
+     "shape": [],
+     "n_bytes": 4,
+     "dtype": "torch.int32"
+    },
+    "model.language_model.layers.0.linear_attn.in_proj_z.trellis": {
+     "shape": [
+      320,
+      384,
+      64
+     ],
+     "n_bytes": 15728640,
+     "dtype": "torch.int16"
+    }
+   },
+   "quant_format": "exl3",
+   "bits_per_weight": 4,
+   "mul1_multiplier": 2212286765
+  },
+  "model.language_model.layers.0.linear_attn.in_proj_b": {
+   "stored_tensors": {
+    "model.language_model.layers.0.linear_attn.in_proj_b.weight": {
+     "shape": [
+      48,
+      5120
+     ],
+     "n_bytes": 491520,
+     "dtype": "torch.float16"
+    }
+   }
+  },
+  "model.language_model.layers.0.linear_attn.in_proj_a": {
+   "stored_tensors": {
+    "model.language_model.layers.0.linear_attn.in_proj_a.weight": {
+     "shape": [
+      48,
+      5120
+     ],
+     "n_bytes": 491520,
+     "dtype": "torch.float16"
+    }
+   }
+  },
+  "model.language_model.layers.0.linear_attn.out_proj": {
+   "stored_tensors": {
+    "model.language_model.layers.0.linear_attn.out_proj.suh": {
+     "shape": [
+      6144
+     ],
+     "n_bytes": 12288,
+     "dtype": "torch.float16"
+    },
+    "model.language_model.layers.0.linear_attn.out_proj.svh": {
+     "shape": [
+      5120
+     ],
+     "n_bytes": 10240,
+     "dtype": "torch.float16"
+    },
+    "model.language_model.layers.0.linear_attn.out_proj.mul1": {
+     "shape": [],
+     "n_bytes": 4,
+     "dtype": "torch.int32"
+    },
+    "model.language_model.layers.0.linear_attn.out_proj.trellis": {
+     "shape": [
+      384,
+      320,
+      64
+     ],
+     "n_bytes": 15728640,
+     "dtype": "torch.int16"
+    }
+   },
+   "quant_format": "exl3",
+   "bits_per_weight": 4,
+   "mul1_multiplier": 2212286765
+  },
+  "model.language_model.layers.0.linear_attn.norm": {
+   "stored_tensors": {
+    "model.language_model.layers.0.linear_attn.norm.weight": {
+     "shape": [
+      128
+     ],
+     "n_bytes": 256,
+     "dtype": "torch.bfloat16"
+    }
+   }
+  }
+ }
+}
