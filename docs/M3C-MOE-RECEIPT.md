@@ -43,16 +43,36 @@ At batch 1 the fused kernel is weight-traffic bound (~9.4 MB of trellis per
 active expert); per-token MoE traffic is ~3.1 GB across 42 layers, which sets
 the AR decode ceiling on this box.
 
-## End-to-end (full engine, TP=1, eager, 4096 ctx, 2k-token prompt, 256 new)
+## End-to-end (full engine, TP=1, 4096 ctx, 2k-token prompt, 256 new)
 
 ```
-before (per-expert loop): 7.67 tok/s
-after  (fused kernel)   : 15.13 tok/s     (1.97x)
+per-expert loop, eager   :  7.67 tok/s
+fused kernel,   eager    : 15.13 tok/s   (1.97x)
+fused kernel,   graphs   : 16.80 tok/s   (2.19x vs loop)
 ```
 
 Greedy sanity prompts stay coherent and correct (2+2 = 4; Paris/population);
-no fused-path fallback warnings in the run log
-(`work/logs/quality-fused-20260919.log`).
+no fused-path fallback warnings in the run logs (`work/logs/`).
+
+### CUDA graphs (FULL, sizes [1,2,4,8,16])
+
+Capture required three fixes:
+
+1. `torch.bincount` is not capturable (`cudaErrorStreamCaptureUnsupported`,
+   it copies through the host) — routing counts now via
+   `zeros + scatter_add_`.
+2. The ext's lazy device context / kernel attributes must exist before
+   capture — `process_weights_after_loading()` runs one 1-token dry run per
+   MoE layer at load time.
+3. The per-expert loop path (`unique/nonzero/tolist`) is not capturable, so
+   capture sizes are capped at the fused path's reach:
+   `cudagraph_capture_sizes=[1,2,4,8,16]` (16 tokens x top-8 = 144 <= 256 row
+   capacity), and `max_num_seqs=64` (the hybrid mamba cache exposes 125
+   blocks; the default 256 refuses to capture).
+
+Graphs buy ~11% at batch 1 — decode is weight-traffic bound, not launch
+bound, so the remaining headroom is kernel efficiency and speculative
+decoding, not more graph coverage.
 
 ## Open
 
