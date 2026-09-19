@@ -42,6 +42,10 @@ python3 -m venv "$VENV"
 # shellcheck disable=SC1091
 source "$VENV/bin/activate"
 python -m pip install --upgrade pip
+# Editable installs below run --no-build-isolation, so the build backend must
+# exist in the venv (fresh venvs ship without setuptools; pip then fails with
+# BackendUnavailable: Cannot import 'setuptools.build_meta').
+python -m pip install setuptools wheel
 
 echo "== vLLM @ pinned commit =="
 mkdir -p "$WORK"
