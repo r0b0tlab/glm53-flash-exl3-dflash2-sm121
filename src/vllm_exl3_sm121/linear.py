@@ -85,6 +85,8 @@ class Exl3LinearMethod(LinearMethodBase):
         self.out_last = 0
         self.in_first = 0
         self.in_last = 0
+        # staging for fused (MergedColumn) halves arriving across calls
+        self._fused_stage: dict = {}
 
     # -- vLLM interface -------------------------------------------------
 
@@ -146,14 +148,42 @@ class Exl3LinearMethod(LinearMethodBase):
 
     def _load_one(self, suffix: str, param: Parameter,
                   loaded_weight: torch.Tensor, *args: Any, **kwargs: Any) -> None:
-        """Load one pack shard tensor, TP-sliced. Fused per-shard routing
-        (loaded_shard_id) fails closed: pack fused tensors map 1:1."""
+        """Load one pack shard tensor, TP-sliced.
+
+        Plain layers: whole tensor in one call. Fused layers
+        (MergedColumn gate_up: shard_id 0/1): halves staged across calls,
+        assembled, then TP-sliced as one fused tensor.
+        """
         sid = kwargs.get("loaded_shard_id", args[0] if args else None)
         if sid is not None:
-            raise ValueError(
-                f"exl3 loader for {self.prefix}: per-shard routing "
-                f"(shard_id={sid!r}) needs the KDA merged-layer census (M3b)")
+            try:
+                shard = int(sid)
+            except (TypeError, ValueError):
+                raise ValueError(
+                    f"exl3 loader for {self.prefix}: shard_id={sid!r} needs "
+                    f"the KDA merged-layer census (M3b)") from None
+            key = (self.prefix, suffix)
+            stage = self._fused_stage.setdefault(key, {})
+            stage[shard] = loaded_weight.detach().clone()
+            if len(stage) < 2:
+                return  # wait for the other half; shapes checked at assembly
+            halves = [stage[i] for i in sorted(stage)]
+            del self._fused_stage[key]
+            if suffix == "trellis":
+                fused = torch.cat(halves, dim=1)
+            elif suffix in ("suh", "svh", "bias"):
+                fused = torch.cat(halves, dim=0) if halves[0].dim() > 0 else halves[0]
+            elif suffix == "mul1":
+                fused = halves[0]
+            else:
+                raise ValueError(f"exl3 loader: unknown suffix {suffix!r}")
+            self._copy_checked(suffix, param, self._slice_for_tp(suffix, fused))
+            return
         data = self._slice_for_tp(suffix, loaded_weight)
+        self._copy_checked(suffix, param, data)
+
+    def _copy_checked(self, suffix: str, param: Parameter,
+                      data: torch.Tensor) -> None:
         if tuple(data.shape) != tuple(param.data.shape):
             raise ValueError(
                 f"exl3 loader shape mismatch for {self.prefix}.{suffix}: "

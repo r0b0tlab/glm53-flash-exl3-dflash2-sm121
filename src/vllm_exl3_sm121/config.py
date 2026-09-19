@@ -116,10 +116,14 @@ class Exl3Config(QuantizationConfig):
                 )
                 return UnquantizedLinearMethod()
         layer_kind = type(layer).__name__
-        if "Moe" in layer_kind or "MoE" in layer_kind or "Expert" in layer_kind:
-            raise NotImplementedError(
-                f"exl3 MoE method for {prefix} ({layer_kind}) lands in M3b; "
-                f"dense path is wired, MoE kernel stays fail-closed")
+        if "Moe" in layer_kind or "MoE" in layer_kind or "Expert" in layer_kind \
+                or "RoutedExperts" in layer_kind:
+            from .moe import Exl3MoEMethod
+            moe_cfg = getattr(layer, "moe_config", None)
+            if moe_cfg is None:
+                raise NotImplementedError(
+                    f"exl3 MoE for {prefix}: no moe_config on {layer_kind}")
+            return Exl3MoEMethod(self, moe_cfg, prefix)
         if "Embedding" in layer_kind:
             raise NotImplementedError(
                 f"exl3 embedding method for {prefix} lands in M3b")
