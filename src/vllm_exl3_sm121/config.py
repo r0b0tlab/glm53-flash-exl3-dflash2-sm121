@@ -71,16 +71,26 @@ class Exl3Config(QuantizationConfig):
     ) -> QuantizeMethodBase | None:
         """Dispatch by module kind and pack metadata.
 
-        ON-CLUSTER TODO: map to vLLM's layer classes (LinearBase,
-        FusedMoE, VocabParallelEmbedding) and instantiate
-        Exl3LinearMethod / Exl3MoEMethod / Exl3EmbeddingMethod. The decision
-        inputs are ready: self.pack.modules[prefix]-style lookup plus the
-        layer's shard geometry (see geometry.py).
+        - `visual.*` (vision tower, vb16 contract): None -> dense load.
+        - LinearBase (attention + dense MLP): Exl3LinearMethod.
+        - FusedMoE / VocabParallelEmbedding: fail closed (M3b).
         """
-        raise NotImplementedError(
-            "Exl3Config.get_quant_method is validated on the cluster build; "
-            "see module docstring TODO list"
-        )
+        from vllm.model_executor.layers.linear import LinearBase
+
+        if prefix.startswith("visual.") or ".visual." in prefix:
+            return None
+        if isinstance(layer, LinearBase):
+            from .linear import Exl3LinearMethod
+            return Exl3LinearMethod(self, prefix)
+        layer_kind = type(layer).__name__
+        if "Moe" in layer_kind or "MoE" in layer_kind or "Expert" in layer_kind:
+            raise NotImplementedError(
+                f"exl3 MoE method for {prefix} ({layer_kind}) lands in M3b; "
+                f"dense path is wired, MoE kernel stays fail-closed")
+        if "Embedding" in layer_kind:
+            raise NotImplementedError(
+                f"exl3 embedding method for {prefix} lands in M3b")
+        return None
 
     # -- helpers ---------------------------------------------------------
 

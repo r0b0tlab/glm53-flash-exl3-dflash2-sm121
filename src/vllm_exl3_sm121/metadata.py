@@ -53,6 +53,23 @@ class PackFormatError(ValueError):
     """Raised when a pack cannot be served (fail closed)."""
 
 
+# tensor_storage entries that are converter-emitted markers, not loadable
+# modules. Observed in real packs (GLM-5.3-Flash EXL3: hc_expand calibration
+# state; hc_head.norm; per-layer hc_attn/hc_ffn calibration norms — 92 empty
+# entries total, all with empty stored_tensors). Skipped by parse_pack,
+# never loaded. Anything else empty still fails closed.
+_NON_MODULE_MARKERS = frozenset({"hc_expand"})
+
+
+def _is_marker_entry(module: str, tensors_raw: Any) -> bool:
+    if not (isinstance(tensors_raw, dict) and not tensors_raw):
+        return False
+    return (module in _NON_MODULE_MARKERS
+            or module == "hc_head.norm"
+            or ".hc_attn." in module
+            or ".hc_ffn." in module)
+
+
 @dataclass(frozen=True)
 class StoredTensor:
     name: str
@@ -130,6 +147,10 @@ def parse_pack(raw: dict[str, Any]) -> Exl3Pack:
         if not isinstance(entry, dict):
             raise PackFormatError(f"[{module}] entry must be an object")
         tensors_raw = entry.get("stored_tensors")
+        if _is_marker_entry(module, tensors_raw):
+            # converter-emitted markers (e.g. hc_expand calibration state),
+            # not loadable modules — skip, do not fail the pack.
+            continue
         if not isinstance(tensors_raw, dict) or not tensors_raw:
             raise PackFormatError(f"[{module}] stored_tensors must be non-empty")
         tensors: dict[str, StoredTensor] = {}

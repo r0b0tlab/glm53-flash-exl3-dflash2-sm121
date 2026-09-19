@@ -9,3 +9,5 @@ work/
 *.bin
 !tests/fixtures/*.json
 .DS_Store
+*.so
+build/
