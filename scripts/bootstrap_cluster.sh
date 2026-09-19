@@ -45,7 +45,7 @@ python -m pip install --upgrade pip
 # Editable installs below run --no-build-isolation, so the build backend must
 # exist in the venv (fresh venvs ship without setuptools; pip then fails with
 # BackendUnavailable: Cannot import 'setuptools.build_meta').
-python -m pip install setuptools wheel setuptools_rust
+python -m pip install setuptools wheel setuptools_rust setuptools_scm packaging
 # vLLM's setup.py imports torch at build time; with --no-build-isolation it
 # must be pre-installed at the locked version (lock: torch 2.13.0+cu130).
 python -m pip install "torch==2.13.0+cu130" --index-url https://download.pytorch.org/whl/cu130
