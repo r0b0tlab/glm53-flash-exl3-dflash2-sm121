@@ -68,9 +68,26 @@ class Exl3LinearMethod(LinearMethodBase):
     def __init__(self, quant_config: Exl3Config, prefix: str) -> None:
         self.quant_config = quant_config
         self.prefix = prefix
+        self.fused: tuple | None = None  # (mq_gate, mq_up) for gate_up_proj
         mq = quant_config.module_quant(prefix)
         if mq is None:
             mq = quant_config.module_quant(_to_hf_prefix(prefix))
+        if mq is None and prefix.endswith(".gate_up_proj"):
+            # pack stores split gate/up; vLLM fuses. Resolve the pair and
+            # assemble in the loader (staged across shard calls).
+            stem = prefix[: -len(".gate_up_proj")]
+            g = quant_config.module_quant(stem + ".gate_proj") or \
+                quant_config.module_quant(_to_hf_prefix(stem) + ".gate_proj")
+            u = quant_config.module_quant(stem + ".up_proj") or \
+                quant_config.module_quant(_to_hf_prefix(stem) + ".up_proj")
+            if g is not None and u is not None and g.is_exl3 and u.is_exl3:
+                gt = g.tensor(".trellis")
+                ut = u.tensor(".trellis")
+                if gt is None or ut is None or gt.shape != ut.shape:
+                    raise ValueError(
+                        f"exl3 fused {prefix}: gate/up trellis mismatch")
+                self.fused = (g, u)
+                mq = g
         if mq is None or not mq.is_exl3:
             raise ValueError(f"no EXL3 pack entry for layer prefix {prefix!r}")
         self.mq = mq
@@ -232,6 +249,13 @@ class Exl3LinearMethod(LinearMethodBase):
         t = self.mq.tensor(".trellis")
         assert t is not None
         s = list(t.shape)
+        if self.fused is not None and not self.is_row_parallel:
+            # fused gate_up: full width is 2x one half; TP-slice the fused
+            # width directly (halves concatenated on dim1 at load).
+            gate_out = self._full_out_features()
+            fused_full = 2 * gate_out
+            s[1] = s[1] * 2 * n_out // fused_full
+            return tuple(s)
         if self.is_row_parallel:
             full_in = self.mq.tensor(".suh")
             assert full_in is not None
