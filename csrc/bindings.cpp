@@ -100,8 +100,13 @@ std::string build_info() {
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-  m.def("exl3_gemv", &exl3_gemv, "EXL3 decode GEMV (m=1, via exl3_gemm)");
-  m.def("exl3_gemm", &exl3_gemm, "EXL3 prefill/batch GEMM (m>1)");
+  using dense_fn_t = torch::Tensor (*)(torch::Tensor, torch::Tensor,
+                                       torch::Tensor, torch::Tensor, int64_t,
+                                       bool, bool, int64_t);
+  m.def("exl3_gemv", static_cast<dense_fn_t>(&exl3_gemv),
+        "EXL3 decode GEMV (m=1, via exl3_gemm)");
+  m.def("exl3_gemm", static_cast<dense_fn_t>(&exl3_gemm),
+        "EXL3 prefill/batch GEMM (m>1)");
   m.def("exl3_moe_gemm", &exl3_moe_gemm, "EXL3 grouped MoE GEMM (M3)");
   m.def("exl3_reconstruct", &exl3_reconstruct, "EXL3 dequantize for checks");
   m.def("build_info", &build_info, "build identification");
