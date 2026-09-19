@@ -81,7 +81,12 @@ class Exl3Config(QuantizationConfig):
             return None
         if isinstance(layer, LinearBase):
             from .linear import Exl3LinearMethod
-            return Exl3LinearMethod(self, prefix)
+            try:
+                return Exl3LinearMethod(self, prefix)
+            except ValueError:
+                # no EXL3 entry for this linear (norms-adjacent, router,
+                # unquantized head): dense load, not an error.
+                return None
         layer_kind = type(layer).__name__
         if "Moe" in layer_kind or "MoE" in layer_kind or "Expert" in layer_kind:
             raise NotImplementedError(
