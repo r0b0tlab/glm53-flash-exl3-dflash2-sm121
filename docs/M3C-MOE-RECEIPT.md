@@ -43,6 +43,17 @@ At batch 1 the fused kernel is weight-traffic bound (~9.4 MB of trellis per
 active expert); per-token MoE traffic is ~3.1 GB across 42 layers, which sets
 the AR decode ceiling on this box.
 
+## End-to-end (full engine, TP=1, eager, 4096 ctx, 2k-token prompt, 256 new)
+
+```
+before (per-expert loop): 7.67 tok/s
+after  (fused kernel)   : 15.13 tok/s     (1.97x)
+```
+
+Greedy sanity prompts stay coherent and correct (2+2 = 4; Paris/population);
+no fused-path fallback warnings in the run log
+(`work/logs/quality-fused-20260919.log`).
+
 ## Open
 
 - Prefill-sized batches still take the loop; the banded/tiled launches
