@@ -28,15 +28,16 @@ ROOT = Path(__file__).resolve().parent.parent
 VENDORED = ROOT / "vendored" / "exllamav3" / "ext"
 
 sources = [str(ROOT / "csrc" / "bindings.cpp")]
-# Milestone M2 (uncomment + wire, one group at a time, with receipts):
-# sources += [
-#     str(VENDORED / "quant" / "exl3_gemv.cu"),
-#     str(VENDORED / "quant" / "exl3_gemm.cu"),
-#     str(VENDORED / "quant" / "exl3_moe.cu"),
-#     str(VENDORED / "quant" / "reconstruct.cu"),
-#     str(VENDORED / "hadamard.cu"),
-#     str(VENDORED / "hgemm.cu"),
-# ]
+# Milestone M2: dense path wired. Translation units for the reference call
+# pattern (exl3_gemm + reconstruct + their support closures). MoE coop units
+# stay out until M3 defines the call convention.
+sources += [
+    str(VENDORED / "quant" / "exl3_gemm.cu"),
+    str(VENDORED / "quant" / "reconstruct.cu"),
+    str(VENDORED / "quant" / "exl3_devctx.cu"),
+    str(VENDORED / "quant" / "exl3_kernel_map.cu"),
+    str(VENDORED / "quant" / "hadamard.cu"),
+]
 
 arch_list = os.environ.get("TORCH_CUDA_ARCH_LIST", "")
 if "12." not in arch_list:

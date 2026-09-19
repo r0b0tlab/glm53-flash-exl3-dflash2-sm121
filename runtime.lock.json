@@ -31,13 +31,38 @@
     "ats_check": "nvidia-smi -q | grep -i 'addressing mode'  # must print ATS"
   },
   "models": {
-    "r0b0tlab/Qwen3.8-27B-EXL3-4.00bpw": {"role": "first end-to-end target (dense)", "local": "workstation: ~/exl3-qwen38-dflash2/models/qwen38-27b-exl3"},
-    "r0b0tlab DFlash2 drafter EXL3 4.00bpw": {"role": "first spec-decode target", "local": "workstation: ~/exl3-qwen38-dflash2/models/dflash2-exl3"},
-    "r0b0tlab/Qwen3.8-Flash-Next-EXL3-2.50bpw": {"role": "hardest current target (MoE mixed + MTP + vision + 51B n-gram table)", "hf": "r0b0tlab/Qwen3.8-Flash-Next-EXL3-2.50bpw"}
+    "r0b0tlab/Qwen3.8-27B-EXL3-4.00bpw": {
+      "role": "first end-to-end target (dense)",
+      "local": "workstation: ~/exl3-qwen38-dflash2/models/qwen38-27b-exl3"
+    },
+    "r0b0tlab DFlash2 drafter EXL3 4.00bpw": {
+      "role": "first spec-decode target",
+      "local": "workstation: ~/exl3-qwen38-dflash2/models/dflash2-exl3"
+    },
+    "r0b0tlab/Qwen3.8-Flash-Next-EXL3-2.50bpw": {
+      "role": "hardest current target (MoE mixed + MTP + vision + 51B n-gram table)",
+      "hf": "r0b0tlab/Qwen3.8-Flash-Next-EXL3-2.50bpw"
+    },
+    "r0b0tlab/GLM-5.3-Flash-EXL3-2.25hq-tapK3": {
+      "role": "first MoE serve target (Glm5Next 45L MoE, 2.32bpw mul1, 92GB, +DFlash2 draft)",
+      "local": "/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3"
+    }
   },
   "reference_only": {
-    "vcruz305/exllamav3": {"ref": "feat/gb10-ats-load", "commit": "954a8ca6e59d48c3e3462068ecf083fe9990f4dc", "license": "MIT", "use": "V4.1 arch + ATS loader reference (to be vendored only when the V4.1 milestone starts, with provenance)"},
-    "vcruz305/vllm-exl3": {"license": "AGPL-3.0-only", "use": "feature checklist and private baselines only - never copy code"},
-    "community_reports": ["vllm #56700 (SM12x pitfall map)", "vllm #56400 (H200 field report)", "exllamav3 #355 (128-output TP boundary)"]
+    "vcruz305/exllamav3": {
+      "ref": "feat/gb10-ats-load",
+      "commit": "954a8ca6e59d48c3e3462068ecf083fe9990f4dc",
+      "license": "MIT",
+      "use": "V4.1 arch + ATS loader reference (to be vendored only when the V4.1 milestone starts, with provenance)"
+    },
+    "vcruz305/vllm-exl3": {
+      "license": "AGPL-3.0-only",
+      "use": "feature checklist and private baselines only - never copy code"
+    },
+    "community_reports": [
+      "vllm #56700 (SM12x pitfall map)",
+      "vllm #56400 (H200 field report)",
+      "exllamav3 #355 (128-output TP boundary)"
+    ]
   }
 }

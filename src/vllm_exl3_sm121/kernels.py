@@ -7,17 +7,24 @@ clean on non-GPU machines and failures are loud and early.
 
 Op surface (implemented in csrc/bindings.cpp):
 
-    exl3_gemv(x, trellis, suh, svh, K, mcg: bool, mul1: bool) -> y
-        Single-token decode path (m=1).
+    exl3_gemv(x, trellis, suh, svh, K, mcg: bool, mul1: bool, n_out: int) -> y
+        Single-token decode path (m=1). Wired via exl3_gemm, matching the
+        reference forward (BC_LinearEXL3 always calls exl3_gemm; K is passed
+        as -1 = read from trellis metadata). n_out added in M2: output rows
+        are not derivable from the trellis shape alone.
 
-    exl3_gemm(x, trellis, suh, svh, K, mcg, mul1) -> y
+    exl3_gemm(x, trellis, suh, svh, K, mcg, mul1, n_out: int) -> y
         Prefill/batch path (m>1).
 
     exl3_moe_gemm(x, expert_ptrs..., K, ...) -> y
         Grouped experts (whole-expert EP placement; no tensor splitting).
+        FAIL-CLOSED until M3 (upstream path is the coop kernel with routing
+        inputs; the vLLM FusedMoE convention lands with the method classes).
 
     exl3_reconstruct(shape_out, trellis, suh, svh, K, mcg, mul1) -> fp16
         Dequantize for correctness checks (reconstruct-MSE vs source).
+        Non-fused path (scales folded in-kernel); mirrors
+        LinearEXL3.reconstruct_hgemm without the Hadamard pre/post passes.
 """
 
 from __future__ import annotations
