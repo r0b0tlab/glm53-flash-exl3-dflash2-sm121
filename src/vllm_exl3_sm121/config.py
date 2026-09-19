@@ -96,7 +96,11 @@ class Exl3Config(QuantizationConfig):
         - LinearBase without pack entry (router, KDA helpers, vision
           tower): explicit UnquantizedLinearMethod + warning (vLLM
           forbids None; silence would risk wrong numerics).
-        - FusedMoE / VocabParallelEmbedding: fail closed (M3b).
+        - ParallelLMHead (VocabParallelEmbedding that passes a quant_config):
+          Exl3LinearMethod when the pack quantized the head (the logits
+          processor calls `quant_method.apply`), else
+          UnquantizedEmbeddingMethod.
+        - FusedMoE / RoutedExperts: Exl3MoEMethod (M3b).
         """
         from vllm.model_executor.layers.linear import LinearBase
 
@@ -115,6 +119,16 @@ class Exl3Config(QuantizationConfig):
                     UnquantizedLinearMethod,
                 )
                 return UnquantizedLinearMethod()
+        from vllm.model_executor.layers.vocab_parallel_embedding import (
+            UnquantizedEmbeddingMethod,
+            VocabParallelEmbedding,
+        )
+        if isinstance(layer, VocabParallelEmbedding):
+            from .linear import Exl3LinearMethod
+            try:
+                return Exl3LinearMethod(self, prefix)
+            except ValueError:
+                return UnquantizedEmbeddingMethod()
         layer_kind = type(layer).__name__
         if "Moe" in layer_kind or "MoE" in layer_kind or "Expert" in layer_kind \
                 or "RoutedExperts" in layer_kind:
@@ -124,9 +138,6 @@ class Exl3Config(QuantizationConfig):
                 raise NotImplementedError(
                     f"exl3 MoE for {prefix}: no moe_config on {layer_kind}")
             return Exl3MoEMethod(self, moe_cfg, prefix)
-        if "Embedding" in layer_kind:
-            raise NotImplementedError(
-                f"exl3 embedding method for {prefix} lands in M3b")
         return None
 
     # -- helpers ---------------------------------------------------------
