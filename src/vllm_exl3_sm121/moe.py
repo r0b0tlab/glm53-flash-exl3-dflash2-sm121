@@ -97,7 +97,7 @@ class Exl3MoEMethod(FusedMoEMethodBase):
             if t is None:
                 raise ValueError(
                     f"exl3 MoE {self.prefix}: expert 0 {name} lacks .trellis")
-            if t.dim() != 3:
+            if len(t.shape) != 3:
                 raise ValueError(
                     f"exl3 MoE {self.prefix}: expert 0 {name} trellis dims "
                     f"{tuple(t.shape)} are not (in/16, out/16, 16K)")

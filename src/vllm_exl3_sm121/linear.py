@@ -138,7 +138,7 @@ class Exl3LinearMethod(LinearMethodBase):
         trellis = mq.tensor(".trellis")
         if trellis is None:
             raise ValueError(f"pack entry {mq.module!r} has no .trellis tensor")
-        if trellis.dim() != 3:
+        if len(trellis.shape) != 3:
             raise ValueError(
                 f"pack entry {mq.module!r} trellis dims {tuple(trellis.shape)} "
                 f"are not (in/16, out/16, 16K)"
