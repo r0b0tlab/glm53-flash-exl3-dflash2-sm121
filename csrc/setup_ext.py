@@ -35,7 +35,8 @@ sources += sorted(
     str(p) for p in (VENDORED / "quant").rglob("*.cu")
     if "moe" not in p.name  # MoE coop units stay out until M3
 )
-sources += [str(VENDORED / "graph.cu")]  # Graph type referenced by gemm entry
+sources += [str(VENDORED / "graph.cu"),
+              str(VENDORED / "cuda_drv.cpp")]  # Graph type + CudaDrv::instance def
 
 arch_list = os.environ.get("TORCH_CUDA_ARCH_LIST", "")
 if "12." not in arch_list:
