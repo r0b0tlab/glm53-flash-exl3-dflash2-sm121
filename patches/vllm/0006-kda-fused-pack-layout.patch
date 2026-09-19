@@ -1,8 +1,40 @@
+diff --git a/vllm/models/glm5next/nvidia/kda.py b/vllm/models/glm5next/nvidia/kda.py
+index 436b9685cb..9067829ed4 100644
+--- a/vllm/models/glm5next/nvidia/kda.py
++++ b/vllm/models/glm5next/nvidia/kda.py
+@@ -192,6 +192,11 @@ class Glm5NextLinearAttention(GatedDeltaNetAttention):
+             super().__init__(config, vllm_config, prefix)
+         finally:
+             vllm_config.quant_config = saved_quant_config
++        # EXL3 packs carry their own KDA projection data (trellis + scales),
++        # so the projections stay quantized for that quant method only.
++        if saved_quant_config is not None and \
++                saved_quant_config.get_name() == "exl3":
++            self.quant_config = saved_quant_config
+ 
+         self.head_dim = config.linear_head_dim
+         self.num_heads = config.linear_num_heads
 diff --git a/vllm/models/glm5next/nvidia/model.py b/vllm/models/glm5next/nvidia/model.py
-index 21918bdf6b..f269b96c03 100644
+index 21918bdf6b..0a6f3c56c0 100644
 --- a/vllm/models/glm5next/nvidia/model.py
 +++ b/vllm/models/glm5next/nvidia/model.py
-@@ -747,6 +747,56 @@ class Glm5NextModel(nn.Module):
+@@ -327,7 +327,14 @@ class Glm5NextDecoderLayer(nn.Module):
+                 kv_lora_rank=config.kv_lora_rank,
+                 max_position_embeddings=config.max_position_embeddings,
+                 cache_config=cache_config,
+-                quant_config=None,  # MLA projections are BF16 in checkpoint
++                # MLA projections are BF16 in FP8 checkpoints; EXL3 packs
++                # quantize them (fused_qkv_a_proj / q_b_proj / o_proj).
++                quant_config=(
++                    quant_config
++                    if quant_config is not None
++                    and quant_config.get_name() == "exl3"
++                    else None
++                ),
+                 prefix=f"{prefix}.self_attn",
+                 topk_indices_buffer=topk_indices_buffer,
+                 skip_rope=config.mla_nope,
+@@ -747,6 +754,56 @@ class Glm5NextModel(nn.Module):
          hidden_states = self.norm(hidden_states)
          return hidden_states
  
@@ -59,7 +91,7 @@ index 21918bdf6b..f269b96c03 100644
      def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]) -> set[str]:
          stacked_params_mapping = [
              # (param_name, shard_name, shard_id)
-@@ -838,6 +888,15 @@ class Glm5NextModel(nn.Module):
+@@ -838,6 +895,15 @@ class Glm5NextModel(nn.Module):
              ):
                  continue
  
