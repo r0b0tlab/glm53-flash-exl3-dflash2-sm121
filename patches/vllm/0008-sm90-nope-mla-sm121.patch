@@ -1,0 +1,44 @@
+diff --git a/vllm/platforms/cuda.py b/vllm/platforms/cuda.py
+index 30eed82ccb..b1893b8d70 100644
+--- a/vllm/platforms/cuda.py
++++ b/vllm/platforms/cuda.py
+@@ -130,8 +130,12 @@ def _get_backend_priorities(
+                 *sparse_backends,
+             ]
+         elif device_capability.major == 12:
++            # GLM53-SM121-NOPE-MLA: the SM120 backend's fp8_ds_mla layout
++            # cannot serve NoPE (pe_dim=0) sparse MLA with a kpool-widened
++            # page table; the SM90 backend can (FA2 path on SM121).
+             return [
+                 AttentionBackendEnum.TRITON_MLA,
++                AttentionBackendEnum.FLASHINFER_MLA_SPARSE_SM90,
+                 AttentionBackendEnum.FLASHINFER_MLA_SPARSE_SM120,
+             ]
+         else:
+diff --git a/vllm/v1/attention/backends/mla/flashinfer_mla_sparse_sm90.py b/vllm/v1/attention/backends/mla/flashinfer_mla_sparse_sm90.py
+index 830bc52ab9..ad4768d0c5 100644
+--- a/vllm/v1/attention/backends/mla/flashinfer_mla_sparse_sm90.py
++++ b/vllm/v1/attention/backends/mla/flashinfer_mla_sparse_sm90.py
+@@ -104,7 +104,10 @@ class FlashInferMLASparseSM90Backend(AttentionBackend):
+ 
+     @classmethod
+     def supports_compute_capability(cls, capability: DeviceCapability) -> bool:
+-        return capability.major == 9
++        # GLM53-SM121-NOPE-MLA: the FA2 path of the FlashInfer MLA wrapper
++        # runs on capability 12 (GB10/SM121); the kernel covers ckv=512 and
++        # kpe in {0, 64}.
++        return capability.major in (9, 12)
+ 
+     @classmethod
+     def supports_combination(
+@@ -199,7 +202,9 @@ class _SM90State:
+             kv_indices=self.kv_indices,
+             kv_len_arr=self.kv_len_arr,
+             use_cuda_graph=True,
+-            backend="fa3",
++            backend=(
++                "fa3" if torch.cuda.get_device_capability()[0] == 9 else "fa2"
++            ),  # GLM53-SM121-NOPE-MLA
+         )
+         self._arange_cpu = torch.arange(self.max_tokens + 1, dtype=torch.int32)
+         self._qo_cpu = torch.empty(self.max_tokens + 1, dtype=torch.int32)
