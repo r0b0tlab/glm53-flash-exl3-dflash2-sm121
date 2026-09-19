@@ -37,7 +37,7 @@ def register() -> None:
 
     from .config import Exl3Config
 
-    register_quantization_config(Exl3Config)
+    register_quantization_config("exl3")(Exl3Config)
     logger.info(
         "vllm_exl3_sm121 %s registered 'exl3' quantization config", __version__
     )
