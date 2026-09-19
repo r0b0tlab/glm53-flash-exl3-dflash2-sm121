@@ -38,9 +38,11 @@ class Exl3Config(QuantizationConfig):
     weight is touched.
     """
 
-    def __init__(self, pack: meta.Exl3Pack) -> None:
+    def __init__(self, pack: meta.Exl3Pack | None,
+                 inline: dict[str, Any] | None = None) -> None:
         super().__init__()
         self.pack = pack
+        self.inline = inline or {}
 
     # -- vLLM QuantizationConfig interface -------------------------------
 
@@ -64,29 +66,55 @@ class Exl3Config(QuantizationConfig):
 
     @classmethod
     def from_config(cls, config: dict[str, Any]) -> "Exl3Config":
-        return cls(meta.parse_pack(config))
+        # File form (quantization_config.json): full pack parse now.
+        # Inline form (config.json's quantization_config summary): the pack
+        # resolves lazily in maybe_update_config, where the model path is
+        # known (vLLM feeds from_config the inline summary, never the file).
+        if isinstance(config.get("tensor_storage"), dict):
+            return cls(meta.parse_pack(config))
+        return cls(None, dict(config))
+
+    def maybe_update_config(self, model_name: str,
+                            hf_config: Any = None,
+                            revision: str | None = None) -> None:
+        if self.pack is not None:
+            return
+        cand = os.path.join(model_name, "quantization_config.json")
+        if not os.path.isfile(cand):
+            raise ValueError(
+                f"exl3 needs {cand} (inline config.json summary has no "
+                f"tensor_storage); point --model at the pack directory")
+        with open(cand) as fh:
+            self.pack = meta.parse_pack(json.load(fh))
 
     def get_quant_method(
         self, layer: torch.nn.Module, prefix: str
     ) -> QuantizeMethodBase | None:
         """Dispatch by module kind and pack metadata.
 
-        - `visual.*` (vision tower, vb16 contract): None -> dense load.
-        - LinearBase (attention + dense MLP): Exl3LinearMethod.
+        - LinearBase with pack entry: Exl3LinearMethod.
+        - LinearBase without pack entry (router, KDA helpers, vision
+          tower): explicit UnquantizedLinearMethod + warning (vLLM
+          forbids None; silence would risk wrong numerics).
         - FusedMoE / VocabParallelEmbedding: fail closed (M3b).
         """
         from vllm.model_executor.layers.linear import LinearBase
 
-        if prefix.startswith("visual.") or ".visual." in prefix:
-            return None
         if isinstance(layer, LinearBase):
             from .linear import Exl3LinearMethod
             try:
                 return Exl3LinearMethod(self, prefix)
             except ValueError:
-                # no EXL3 entry for this linear (norms-adjacent, router,
-                # unquantized head): dense load, not an error.
-                return None
+                # No EXL3 entry: genuinely unquantized linear (router,
+                # KDA helpers, vision tower dense weights). vLLM forbids
+                # None here, so resolve explicit dense and say so loudly.
+                import logging
+                logging.getLogger("vllm_exl3_sm121").warning(
+                    "exl3: no pack entry for %s — dense load", prefix)
+                from vllm.model_executor.layers.linear import (
+                    UnquantizedLinearMethod,
+                )
+                return UnquantizedLinearMethod()
         layer_kind = type(layer).__name__
         if "Moe" in layer_kind or "MoE" in layer_kind or "Expert" in layer_kind:
             raise NotImplementedError(
@@ -107,6 +135,8 @@ class Exl3Config(QuantizationConfig):
 
     def module_quant(self, prefix: str) -> meta.ModuleQuant | None:
         """Normalize a vLLM prefix to a pack entry (longest-prefix match)."""
+        if self.pack is None:
+            return None
         best: meta.ModuleQuant | None = None
         best_len = -1
         for name, mq in self.pack.modules.items():
