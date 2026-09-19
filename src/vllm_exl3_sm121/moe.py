@@ -139,6 +139,11 @@ class Exl3MoEMethod(FusedMoEMethodBase):
         self._check_shapes(pname, param)
         return True
 
+    def get_fused_moe_quant_config(self, layer) -> None:
+        # v1 apply() is a custom per-expert loop, not the modular kernel
+        # infra, so no kernel quant config is needed.
+        return None
+
     def apply(self, layer, x, topk_weights, topk_ids,
               shared_experts=None, shared_experts_input=None):
         ext = kernels.require()
