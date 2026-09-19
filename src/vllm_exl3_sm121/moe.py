@@ -171,8 +171,14 @@ class Exl3MoEMethod(FusedMoEMethodBase):
     def _expert_entry(self, expert: int, proj: str):
         mq = None
         cfg = self.quant_config
-        for cand in (f"{self.prefix}.experts.{expert}.{proj}",
-                     f"{self.hf_prefix}.experts.{expert}.{proj}"):
+        base = self.prefix
+        if base.endswith(".experts"):
+            base = base[:len(base) - len(".experts")]
+        hbase = self.hf_prefix
+        if hbase.endswith(".experts"):
+            hbase = hbase[:len(hbase) - len(".experts")]
+        for cand in (f"{base}.experts.{expert}.{proj}",
+                     f"{hbase}.experts.{expert}.{proj}"):
             for name, m in cfg.pack.modules.items():
                 if name == cand and m.is_exl3:
                     return m
