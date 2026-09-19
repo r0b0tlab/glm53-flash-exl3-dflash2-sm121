@@ -13,5 +13,6 @@ build.
 | 0003 | deepgemm-warmup-skip | DeepGEMM autotune deadlock on first 128K+ batch (#56700 pitfall 1) | none; make skip/eager first-boot explicit |
 | 0004 | nope-pad-guard | NoPE/padded-shard guards for aarch64/sm121 builds (pattern from our GLM package) | none |
 | 0005 | engram-file-backed-hook | Allow Engram tables to be file-backed instead of host-RAM cpu_offload (UMA hosts) | #56357 closed unmerged; we carry it privately |
+| 0006 | kda-fused-pack-layout | exllamav3-layout packs store KDA q\|k\|v fused (`qkv_proj`, `conv1d`); route them to the model's `in_proj_qkvbfg_a` / per-part conv params (qkv split owned by the EXL3 method) | none; pack-layout bridge for our converts |
 
-No patches are applied until the first cluster build records real anchors.
+0006 is applied to `work/vllm` at the pinned base (`a00a3544b93e`) and its anchors are recorded in the patch file; the rest are pending until their anchors are recorded at first cluster build.

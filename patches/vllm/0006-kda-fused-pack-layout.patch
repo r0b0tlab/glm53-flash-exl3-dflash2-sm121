@@ -1,0 +1,77 @@
+diff --git a/vllm/models/glm5next/nvidia/model.py b/vllm/models/glm5next/nvidia/model.py
+index 21918bdf6b..f269b96c03 100644
+--- a/vllm/models/glm5next/nvidia/model.py
++++ b/vllm/models/glm5next/nvidia/model.py
+@@ -747,6 +747,56 @@ class Glm5NextModel(nn.Module):
+         hidden_states = self.norm(hidden_states)
+         return hidden_states
+ 
++    def _load_kda_fused(
++        self,
++        name: str,
++        loaded_weight: torch.Tensor,
++        params_dict: dict[str, torch.nn.Parameter],
++        loaded_params: set[str],
++    ) -> bool:
++        """Route exllamav3-layout fused KDA tensors into the model's params.
++
++        Packs converted from the split HF layout store KDA q|k|v fused (row
++        order verified against the BF16 source) as ``self_attn.qkv_proj`` and
++        the KDA short-conv as ``self_attn.conv1d``; this model holds a merged
++        ``in_proj_qkvbfg_a`` and per-part q/k/v conv linears. The quant method
++        owns the qkv trellis split; the conv is split here.
++        """
++        parts = name.split(".")
++        if len(parts) < 5 or parts[0] != "layers" or parts[2] != "self_attn":
++            return False
++        layer_idx, kind = int(parts[1]), parts[3]
++        suffix = ".".join(parts[4:])
++        if kind == "qkv_proj":
++            target = f"layers.{layer_idx}.self_attn.in_proj_qkvbfg_a.{suffix}"
++            param = params_dict.get(target)
++            if param is None:
++                return False
++            param.weight_loader(param, loaded_weight)
++            loaded_params.add(target)
++            return True
++        if kind == "conv1d" and suffix == "weight":
++            attn = self.layers[layer_idx].self_attn
++            proj = attn.head_dim * attn.num_heads
++            chunks = loaded_weight.split(proj, dim=0)
++            if len(chunks) != 3:
++                raise ValueError(
++                    f"KDA fused conv1d {name}: {tuple(loaded_weight.shape)} "
++                    f"is not 3 x {proj} rows"
++                )
++            for conv, chunk, part in zip(
++                (attn.q_conv1d, attn.k_conv1d, attn.v_conv1d),
++                chunks,
++                ("q_conv1d", "k_conv1d", "v_conv1d"),
++            ):
++                weight_loader = getattr(
++                    conv.weight, "weight_loader", default_weight_loader
++                )
++                weight_loader(conv.weight, chunk)
++                loaded_params.add(f"layers.{layer_idx}.self_attn.{part}.weight")
++            return True
++        return False
++
+     def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]) -> set[str]:
+         stacked_params_mapping = [
+             # (param_name, shard_name, shard_id)
+@@ -838,6 +888,15 @@ class Glm5NextModel(nn.Module):
+             ):
+                 continue
+ 
++            # exllamav3-layout packs fuse the KDA q,k,v projections into one
++            # qkv_proj tensor and the KDA short-conv into one conv1d tensor;
++            # route them to the model's per-part params.
++            if ".self_attn.qkv_proj." in name or ".self_attn.conv1d." in name:
++                if self._load_kda_fused(
++                    name, loaded_weight, params_dict, loaded_params
++                ):
++                    continue
++
+             # Pad kv_a_proj_with_mqa for NoPE models
+             if kv_a_pad_size > 0 and ".kv_a_proj_with_mqa." in name:
+                 pad = torch.zeros(
