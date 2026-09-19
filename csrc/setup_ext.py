@@ -28,13 +28,10 @@ ROOT = Path(__file__).resolve().parent.parent
 VENDORED = ROOT / "vendored" / "exllamav3" / "ext"
 
 sources = [str(ROOT / "csrc" / "bindings.cpp")]
-# Milestone M2: dense path wired. Full kernel closure (mirrors the upstream
-# TU layout; the kernel map references comp-unit instantiations by symbol,
-# so partial lists die at link time with undefined symbols).
-sources += sorted(
-    str(p) for p in (VENDORED / "quant").rglob("*.cu")
-    if "moe" not in p.name  # MoE coop units stay out until M3
-)
+# M2: dense path wired. M3c-perf: the fused MoE TUs are in as well (the
+# kernel map references comp-unit instantiations by symbol, so partial lists
+# die at link time with undefined symbols).
+sources += sorted(str(p) for p in (VENDORED / "quant").rglob("*.cu"))
 sources += [str(VENDORED / "graph.cu"),
               str(VENDORED / "cuda_drv.cpp")]  # Graph type + CudaDrv::instance def
 

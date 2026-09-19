@@ -16,10 +16,24 @@ Op surface (implemented in csrc/bindings.cpp):
     exl3_gemm(x, trellis, suh, svh, K, mcg, mul1, n_out: int) -> y
         Prefill/batch path (m>1).
 
-    exl3_moe_gemm(x, expert_ptrs..., K, ...) -> y
-        Grouped experts (whole-expert EP placement; no tensor splitting).
-        FAIL-CLOSED until M3 (upstream path is the coop kernel with routing
-        inputs; the vLLM FusedMoE convention lands with the method classes).
+    exl3_moe_max_concurrency(device: int) -> int
+        Expert groups the fused MoE kernel can run concurrently (buffer count).
+
+    exl3_moe(hidden, out_state, expert_count, token_sorted, weight_sorted,
+             temp_state_g, temp_state_u, temp_intermediate_g,
+             temp_intermediate_u, act_function, K_gate, K_up, K_down,
+             gate/up/down ptrs (trellis, suh, svh), gate/up/down mcg/mul1,
+             act_limit, num_active, output_scratch, fused_base,
+             count_lo, count_hi, m_tile)
+        Fused MoE: one cooperative kernel per [count_lo, count_hi] row band
+        runs gate/up/down for every active expert. Deterministic mode
+        (output_scratch set): each fused assignment writes a weighted fp32
+        row at fused_base[expert] + row; out_state is untouched.
+
+    exl3_moe_gather(out_state, scratch, flat_expert, inv_order, expert_start,
+                    slot_base, slot_kind, weight_sorted)
+        Sums each token's top-k slots (in k order) from the fp32 scratch into
+        the pre-zeroed fp32 out_state.
 
     exl3_reconstruct(shape_out, trellis, suh, svh, K, mcg, mul1) -> fp16
         Dequantize for correctness checks (reconstruct-MSE vs source).
@@ -36,7 +50,9 @@ _EXT_MODULE = "vllm_exl3_sm121_ext"
 _REQUIRED_OPS = (
     "exl3_gemv",
     "exl3_gemm",
-    "exl3_moe_gemm",
+    "exl3_moe",
+    "exl3_moe_gather",
+    "exl3_moe_max_concurrency",
     "exl3_reconstruct",
 )
 

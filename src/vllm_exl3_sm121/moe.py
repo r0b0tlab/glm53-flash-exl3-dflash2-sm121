@@ -19,8 +19,12 @@ Design (verified against the pinned source):
   the first full-model load before any weight was read.)
 - TP=1 in v1: every expert local. TP>1/EP fails closed (M3c) — the mapping
   already carries physical expert ids, so EP is loader-range work.
-- apply() v1: per-expert loop over routed tokens with the wired exl3_gemm
-  (correct-first; coop kernels in the M2b-perf pass).
+- apply() has two paths: the fused kernel (M3c-perf; default) and the
+  per-expert loop (fallback for shapes the fused path does not cover yet,
+  e.g. prefill batches larger than the kernel's row capacity). The fused
+  path mirrors the reference's all-fused deterministic mode: sort the
+  assignments by expert, one cooperative `exl3_moe` launch over the row band,
+  then one `exl3_moe_gather` that sums each token's top-k slots in k order.
 """
 
 from __future__ import annotations
@@ -64,6 +68,8 @@ class Exl3MoEMethod(FusedMoEMethodBase):
         self.k2 = 0
         self.mcg = False
         self.mul1 = True
+        self._fused: dict | None = None
+        self._fused_disabled = False
 
     # -- vLLM interface -------------------------------------------------
 
@@ -178,12 +184,25 @@ class Exl3MoEMethod(FusedMoEMethodBase):
         return True
 
     def get_fused_moe_quant_config(self, layer) -> None:
-        # v1 apply() is a custom per-expert loop, not the modular kernel
-        # infra, so no kernel quant config is needed.
+        # apply() drives the vendored fused kernel directly, not the modular
+        # kernel infra, so no kernel quant config is needed.
         return None
 
     def apply(self, layer, x, topk_weights, topk_ids,
               shared_experts=None, shared_experts_input=None):
+        """Fused kernel when the batch fits its row capacity, else the loop."""
+        if not self._fused_disabled and x.is_cuda and topk_ids.numel() > 0:
+            num_tokens, top_k = topk_ids.shape
+            rows = 256 if self.mul1 else 128  # wide tiles need the mul1 codebook
+            if (top_k <= 32 and num_tokens * top_k <= rows
+                    and x.shape[-1] == self.hidden
+                    and x.dtype in (torch.float16, torch.bfloat16)):
+                if self._ensure_fused(layer, x.device):
+                    return self._apply_fused(layer, x, topk_weights, topk_ids)
+        return self._apply_loop(layer, x, topk_weights, topk_ids)
+
+    def _apply_loop(self, layer, x, topk_weights, topk_ids):
+        """Per-expert fallback: one exl3_gemm set per routed expert."""
         ext = kernels.require()
         in_dtype = x.dtype
         if x.dtype == torch.bfloat16:
@@ -211,6 +230,112 @@ class Exl3MoEMethod(FusedMoEMethodBase):
         if out.dtype != in_dtype:
             out = out.to(in_dtype)
         return out
+
+    # -- fused path (M3c-perf) -------------------------------------------
+
+    def _ensure_fused(self, layer, device) -> bool:
+        """Build the fused-kernel state once: pointer tables + temp buffers.
+
+        The pointer tables are built from the loaded parameter tensors'
+        storage (the stacked (e, 2, ...) layout gives gate = expert base and
+        up = +one-half stride), mirroring the reference's per-expert data_ptr
+        lists.
+        """
+        if self._fused_disabled:
+            return False
+        if self._fused is not None:
+            return True
+        try:
+            ext = kernels.require()
+            e = self.num_experts
+
+            def half_ptrs(t: torch.Tensor):
+                es = t.element_size()
+                base = t.data_ptr()
+                s0, s1 = t.stride(0), t.stride(1)
+                g = [base + i * s0 * es for i in range(e)]
+                u = [base + (i * s0 + s1) * es for i in range(e)]
+                return (torch.tensor(g, dtype=torch.int64, device=device),
+                        torch.tensor(u, dtype=torch.int64, device=device))
+
+            def flat_ptrs(t: torch.Tensor) -> torch.Tensor:
+                es = t.element_size()
+                base = t.data_ptr()
+                s0 = t.stride(0)
+                return torch.tensor([base + i * s0 * es for i in range(e)],
+                                    dtype=torch.int64, device=device)
+
+            t13, s13, v13 = (layer.w13_trellis.data, layer.w13_suh.data,
+                             layer.w13_svh.data)
+            gate_t, up_t = half_ptrs(t13)
+            gate_suh, up_suh = half_ptrs(s13)
+            gate_svh, up_svh = half_ptrs(v13)
+            rows = 256 if self.mul1 else 128
+            c = int(ext.exl3_moe_max_concurrency(device.index or 0))
+            temp_g = torch.empty((c, rows, self.hidden), dtype=torch.float16,
+                                 device=device)
+            temp_ig = torch.empty((c, rows, self.inter), dtype=torch.float16,
+                                  device=device)
+            self._fused = {
+                "rows": rows,
+                "gate_t": gate_t, "gate_suh": gate_suh, "gate_svh": gate_svh,
+                "up_t": up_t, "up_suh": up_suh, "up_svh": up_svh,
+                "down_t": flat_ptrs(layer.w2_trellis.data),
+                "down_suh": flat_ptrs(layer.w2_suh.data),
+                "down_svh": flat_ptrs(layer.w2_svh.data),
+                "temp_g": temp_g, "temp_u": torch.empty_like(temp_g),
+                "temp_ig": temp_ig, "temp_iu": torch.empty_like(temp_ig),
+            }
+            return True
+        except Exception as exc:  # fail closed to the loop path
+            import logging
+            logging.getLogger("vllm_exl3_sm121").warning(
+                "exl3 MoE %s: fused path unavailable (%s); per-expert loop",
+                self.prefix, exc)
+            self._fused_disabled = True
+            return False
+
+    def _apply_fused(self, layer, x, topk_weights, topk_ids):
+        ext = kernels.require()
+        f = self._fused
+        assert f is not None
+        num_tokens, top_k = topk_ids.shape
+        a = num_tokens * top_k
+        x16 = x.to(torch.float16) if x.dtype == torch.bfloat16 else x
+        x16 = x16.contiguous()
+        flat_expert = topk_ids.reshape(-1).to(torch.int64)
+        flat_weight = topk_weights.reshape(-1).to(torch.float16)
+        flat_token = torch.arange(num_tokens, dtype=torch.int64,
+                                  device=x.device).repeat_interleave(top_k)
+        order = flat_expert.argsort()
+        token_sorted = flat_token[order].contiguous()
+        weight_sorted = flat_weight[order].contiguous()
+        expert_count = torch.bincount(flat_expert,
+                                      minlength=self.num_experts + 1)
+        inv_order = torch.empty_like(order)
+        inv_order.scatter_(0, order,
+                           torch.arange(a, dtype=torch.int64, device=x.device))
+        expert_start = torch.cumsum(expert_count, 0) - expert_count
+        tables = torch.stack([expert_start, expert_start,
+                              (expert_count > 0).to(torch.int64)])
+        scratch = torch.empty((max(a, 1), self.hidden), dtype=torch.float32,
+                              device=x.device)
+        out = torch.zeros((num_tokens, self.hidden), dtype=torch.float32,
+                          device=x.device)
+        ext.exl3_moe(
+            x16, out, expert_count, token_sorted, weight_sorted,
+            f["temp_g"], f["temp_u"], f["temp_ig"], f["temp_iu"],
+            0, self.k13, self.k13, self.k2,  # act silu; K gate/up/down
+            f["gate_t"], f["gate_suh"], f["gate_svh"],
+            f["up_t"], f["up_suh"], f["up_svh"],
+            f["down_t"], f["down_suh"], f["down_svh"],
+            self.mcg, self.mul1, self.mcg, self.mul1, self.mcg, self.mul1,
+            0.0, -1, scratch, tables[0], 1, f["rows"], 16)
+        ext.exl3_moe_gather(
+            out, scratch, flat_expert, inv_order,
+            tables[1, :self.num_experts], tables[0, :self.num_experts],
+            tables[2, :self.num_experts], weight_sorted)
+        return out.to(x.dtype)
 
     # -- internals -------------------------------------------------------
 
