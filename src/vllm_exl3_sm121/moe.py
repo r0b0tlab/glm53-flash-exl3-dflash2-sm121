@@ -188,6 +188,31 @@ class Exl3MoEMethod(FusedMoEMethodBase):
         # kernel infra, so no kernel quant config is needed.
         return None
 
+    def process_weights_after_loading(self, layer) -> None:
+        """Warm the fused path once per layer, before any graph capture.
+
+        The ext's device context and kernel attributes are created lazily on
+        the first kernel use; doing that inside a CUDA-graph capture would
+        fail (cudaMalloc is capture-unsupported). One 1-token dry run here
+        (load time) keeps capture clean and validates the path early.
+        """
+        try:
+            device = layer.w13_trellis.data.device
+            if not self._ensure_fused(layer, device):
+                return
+            x = torch.zeros((1, self.hidden), dtype=torch.float16,
+                            device=device)
+            ids = torch.zeros((1, 1), dtype=torch.int32, device=device)
+            w = torch.ones((1, 1), dtype=torch.float32, device=device)
+            self._apply_fused(layer, x, w, ids)
+            torch.cuda.synchronize()
+        except Exception as exc:
+            import logging
+            logging.getLogger("vllm_exl3_sm121").warning(
+                "exl3 MoE %s: fused warmup failed (%s); per-expert loop",
+                self.prefix, exc)
+            self._fused_disabled = True
+
     def apply(self, layer, x, topk_weights, topk_ids,
               shared_experts=None, shared_experts_input=None):
         """Fused kernel when the batch fits its row capacity, else the loop."""
@@ -310,8 +335,11 @@ class Exl3MoEMethod(FusedMoEMethodBase):
         order = flat_expert.argsort()
         token_sorted = flat_token[order].contiguous()
         weight_sorted = flat_weight[order].contiguous()
-        expert_count = torch.bincount(flat_expert,
-                                      minlength=self.num_experts + 1)
+        # bincount is not CUDA-graph-capturable (it copies through the host);
+        # scatter_add_ is the capture-safe equivalent.
+        expert_count = torch.zeros(self.num_experts + 1, dtype=torch.int64,
+                                   device=x.device)
+        expert_count.scatter_add_(0, flat_expert, torch.ones_like(flat_expert))
         inv_order = torch.empty_like(order)
         inv_order.scatter_(0, order,
                            torch.arange(a, dtype=torch.int64, device=x.device))
