@@ -510,4 +510,8 @@ def _to_hf_prefix(prefix: str) -> str:
     p = prefix
     if p.startswith("language_model.model."):
         p = "model.language_model." + p[len("language_model.model."):]
+    elif p == "language_model.lm_head":
+        p = "lm_head"
+    elif p.startswith("language_model.lm_head."):
+        p = "lm_head" + p[len("language_model.lm_head"):]
     return p
