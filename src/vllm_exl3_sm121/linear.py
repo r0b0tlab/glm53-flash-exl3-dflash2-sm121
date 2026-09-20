@@ -111,10 +111,16 @@ class Exl3LinearMethod(LinearMethodBase):
 
     @staticmethod
     def _lookup(qc: Exl3Config, name: str):
-        mq = qc.module_quant(name)
-        if mq is None:
-            mq = qc.module_quant(_to_hf_prefix(name))
-        return mq
+        candidates = [name, _to_hf_prefix(name)]
+        if name.startswith("model."):
+            # DFlash2 draft packs store bare names ("layers.0...", "fc")
+            # while vLLM prefixes the draft model with "model.".
+            candidates.append(name[len("model."):])
+        for cand in candidates:
+            mq = qc.module_quant(cand)
+            if mq is not None:
+                return mq
+        return None
 
     def _resolve_shards(self, qc: Exl3Config, prefix: str) -> list[dict]:
         # KDA merged input projection: fused EXL3 qkv + dense b/f_a/g_a.

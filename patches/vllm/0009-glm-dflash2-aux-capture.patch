@@ -1,0 +1,170 @@
+diff --git a/vllm/models/glm5next/nvidia/model.py b/vllm/models/glm5next/nvidia/model.py
+index 21918bdf6b..61f7a3a255 100644
+--- a/vllm/models/glm5next/nvidia/model.py
++++ b/vllm/models/glm5next/nvidia/model.py
+@@ -60,9 +60,11 @@ from vllm.model_executor.models.glm4_1v import (
+     Glm4vForConditionalGeneration,
+ )
+ from vllm.model_executor.models.interfaces import (
++    EagleModelMixin,
+     HasInnerState,
+     IsHybrid,
+     MixtureOfExperts,
++    SupportsEagle3,
+     SupportsPP,
+ )
+ from vllm.model_executor.models.utils import (
+@@ -327,7 +329,14 @@ class Glm5NextDecoderLayer(nn.Module):
+                 kv_lora_rank=config.kv_lora_rank,
+                 max_position_embeddings=config.max_position_embeddings,
+                 cache_config=cache_config,
+-                quant_config=None,  # MLA projections are BF16 in checkpoint
++                # MLA projections are BF16 in FP8 checkpoints; EXL3 packs
++                # quantize them (fused_qkv_a_proj / q_b_proj / o_proj).
++                quant_config=(
++                    quant_config
++                    if quant_config is not None
++                    and quant_config.get_name() == "exl3"
++                    else None
++                ),
+                 prefix=f"{prefix}.self_attn",
+                 topk_indices_buffer=topk_indices_buffer,
+                 skip_rope=config.mla_nope,
+@@ -619,7 +628,7 @@ class Glm5NextDecoderLayer(nn.Module):
+         )
+ 
+ 
+-class Glm5NextModel(nn.Module):
++class Glm5NextModel(nn.Module, EagleModelMixin):  # GLM53-DFLASH2-AUX-CAPTURE
+     def __init__(self, *, vllm_config: VllmConfig, prefix: str = ""):
+         super().__init__()
+ 
+@@ -726,10 +735,28 @@ class Glm5NextModel(nn.Module):
+         if self.is_sequence_parallel:
+             hidden_states = sp_shard(hidden_states)
+ 
+-        for layer in self._active_layers:
++        # GLM53-DFLASH2-AUX-CAPTURE: DFlash2/EAGLE-3 aux capture. The runner
++        # converts target_layer_ids to id+1 semantics, so `idx + 1 in
++        # aux_hidden_state_layers` captures the OUTPUT of 0-based layer idx.
++        # Mid-stack mHC layers defer their final hc_post to the next layer's
++        # fused pre, so materialize it (pure op) and contract the 4 streams
++        # to one 4096-wide tensor, matching the last layer's hc_contract.
++        aux_hidden_states: list[torch.Tensor] = []
++        for idx, layer in enumerate(self._active_layers, start=self.start_layer):
+             hidden_states, residual, post, comb = layer(
+                 positions, hidden_states, residual, post, comb
+             )
++            if idx + 1 in self.aux_hidden_state_layers:
++                if post is not None:
++                    aux_recon = layer.hc_post(hidden_states, residual, post, comb)
++                    aux_hidden_state = hc_contract(aux_recon, layer.n)
++                else:
++                    aux_hidden_state = hidden_states
++                if self.is_sequence_parallel:
++                    aux_hidden_state = sp_all_gather(aux_hidden_state)[
++                        :full_num_tokens
++                    ]
++                aux_hidden_states.append(aux_hidden_state)
+ 
+         if not get_pp_group().is_last_rank:
+             # PP is gated off for GLM-5.3-Flash (no make_empty_intermediate_tensors),
+@@ -745,8 +772,60 @@ class Glm5NextModel(nn.Module):
+             hidden_states = sp_all_gather(hidden_states)[:full_num_tokens]
+ 
+         hidden_states = self.norm(hidden_states)
++        if len(aux_hidden_states) > 0:  # GLM53-DFLASH2-AUX-CAPTURE
++            return hidden_states, aux_hidden_states
+         return hidden_states
+ 
++    def _load_kda_fused(
++        self,
++        name: str,
++        loaded_weight: torch.Tensor,
++        params_dict: dict[str, torch.nn.Parameter],
++        loaded_params: set[str],
++    ) -> bool:
++        """Route exllamav3-layout fused KDA tensors into the model's params.
++
++        Packs converted from the split HF layout store KDA q|k|v fused (row
++        order verified against the BF16 source) as ``self_attn.qkv_proj`` and
++        the KDA short-conv as ``self_attn.conv1d``; this model holds a merged
++        ``in_proj_qkvbfg_a`` and per-part q/k/v conv linears. The quant method
++        owns the qkv trellis split; the conv is split here.
++        """
++        parts = name.split(".")
++        if len(parts) < 5 or parts[0] != "layers" or parts[2] != "self_attn":
++            return False
++        layer_idx, kind = int(parts[1]), parts[3]
++        suffix = ".".join(parts[4:])
++        if kind == "qkv_proj":
++            target = f"layers.{layer_idx}.self_attn.in_proj_qkvbfg_a.{suffix}"
++            param = params_dict.get(target)
++            if param is None:
++                return False
++            param.weight_loader(param, loaded_weight)
++            loaded_params.add(target)
++            return True
++        if kind == "conv1d" and suffix == "weight":
++            attn = self.layers[layer_idx].self_attn
++            proj = attn.head_dim * attn.num_heads
++            chunks = loaded_weight.split(proj, dim=0)
++            if len(chunks) != 3:
++                raise ValueError(
++                    f"KDA fused conv1d {name}: {tuple(loaded_weight.shape)} "
++                    f"is not 3 x {proj} rows"
++                )
++            for conv, chunk, part in zip(
++                (attn.q_conv1d, attn.k_conv1d, attn.v_conv1d),
++                chunks,
++                ("q_conv1d", "k_conv1d", "v_conv1d"),
++            ):
++                weight_loader = getattr(
++                    conv.weight, "weight_loader", default_weight_loader
++                )
++                weight_loader(conv.weight, chunk)
++                loaded_params.add(f"layers.{layer_idx}.self_attn.{part}.weight")
++            return True
++        return False
++
+     def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]) -> set[str]:
+         stacked_params_mapping = [
+             # (param_name, shard_name, shard_id)
+@@ -838,6 +917,15 @@ class Glm5NextModel(nn.Module):
+             ):
+                 continue
+ 
++            # exllamav3-layout packs fuse the KDA q,k,v projections into one
++            # qkv_proj tensor and the KDA short-conv into one conv1d tensor;
++            # route them to the model's per-part params.
++            if ".self_attn.qkv_proj." in name or ".self_attn.conv1d." in name:
++                if self._load_kda_fused(
++                    name, loaded_weight, params_dict, loaded_params
++                ):
++                    continue
++
+             # Pad kv_a_proj_with_mqa for NoPE models
+             if kv_a_pad_size > 0 and ".kv_a_proj_with_mqa." in name:
+                 pad = torch.zeros(
+@@ -931,7 +1019,7 @@ class Glm5NextModel(nn.Module):
+ 
+ 
+ class Glm5NextForCausalLM(
+-    nn.Module, HasInnerState, SupportsPP, MixtureOfExperts, IsHybrid
++    nn.Module, HasInnerState, SupportsPP, SupportsEagle3, MixtureOfExperts, IsHybrid
+ ):
+     def __init__(self, *, vllm_config: VllmConfig, prefix: str = ""):
+         super().__init__()
+@@ -1027,7 +1115,11 @@ class Glm5NextForCausalLM(
+     dummy_inputs=Glm4vDummyInputsBuilder,
+ )
+ class Glm5NextForConditionalGeneration(
+-    Glm4vForConditionalGeneration, HasInnerState, IsHybrid, MixtureOfExperts
++    Glm4vForConditionalGeneration,
++    HasInnerState,
++    IsHybrid,
++    MixtureOfExperts,
++    SupportsEagle3,
+ ):
+     # The text model (KDA + dense-MLA + MoE) is a hybrid mamba model. The
+     # multimodal wrapper must declare the same interfaces so vLLM treats it as
