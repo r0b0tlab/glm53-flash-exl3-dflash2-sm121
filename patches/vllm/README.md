@@ -18,3 +18,4 @@ build.
 | 0008 | sm90-nope-mla-sm121 | Offer `FLASHINFER_MLA_SPARSE_SM90` on capability 12 and run its FlashInfer wrapper with FA2 off Hopper: the SM120 backend cannot take a kpool-widened page table (no flashinfer dispatch for topk=2176) and its fp8_ds_mla layout is NoPE-hostile | port of the GLM53-NVFP4 P1 patch (proven serving GLM-5.3-Flash NVFP4 on 2x GB10); SM120+0007 stays as the fallback route |
 
 0006, 0007 and 0008 are applied to `work/vllm` at the pinned base (`a00a3544b93e`) and their anchors are recorded in the patch files; the rest are pending until their anchors are recorded at first cluster build.
+| 0012 | `glm-dflash2-drafter-kv-group.patch` | `vllm/v1/core/kv_cache_utils.py` | GLM-5-Next KV fast path learns the DFlash2 drafter's SWA layers: one extra group (exact-fit slot share or standalone), never page_size_padded. Inert without a drafter. |
