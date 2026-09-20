@@ -70,8 +70,10 @@ ladder), `work/bench/kladder_curve.py` (curve + acceptance telemetry).
 
 ## Status / limits
 
-- Single GB10, TP=1. Quality campaign (Q200v2 / BFCL hard-20) pending;
-  C≥2 tool-call loads not exercised; TP=2 parked.
+- Single GB10, TP=1. Quality campaign (Q200v2 / BFCL hard-20) staged but not
+  run; C≥2 tool-call loads not exercised; TP=2 parked.
+- Vision: verified (image Q&A smoke on the published config — see
+  `docs/RESULTS.md`; image requests are drafted text-only).
 - The concurrency ceiling is the vLLM v1 host step on this platform (measured;
   see the finding doc) — kernels are not the limiter (tensor cores engaged,
   11–13% utilized, memory/issue-bound at these shapes).

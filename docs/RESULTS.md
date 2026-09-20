@@ -70,6 +70,20 @@ K=5 ladder scales (C16 +35 % over K=7). Ship K=5; K=7 is one flag away
   near-tie flips (the documented GB10 batch-shape nondeterminism class; both
   continuations fluent).
 
+## Multimodal — vision smoke (live on the published config, 2026-09-20)
+
+Two synthetic image probes through `/v1/chat/completions` returned exact
+readings: text-in-image ("BANANA 42" in a red-bordered frame) and a
+count/color/label question (3 circles — blue/green/orange left-to-right, plus
+"HELLO WORLD"). The pack ships the 347-tensor vision tower (`model.visual.*`);
+the engine wires the MM encoder (FLASH_ATTN) with a 32k-token encoder cache.
+Image requests are drafted **text-only** — the DFlash2 drafter logs
+"does not support external multimodal embeddings" and passes text draft inputs.
+
+Reproduce: `work/bench/vision_probe.py`; evidence
+`work/logs/vision-probe-20260920.log`. Vision was NOT part of the timing
+ladder; the perf rows are text-only.
+
 ## Engine work behind these numbers
 
 - Fused EXL3 MoE (`exl3_moe` / `exl3_moe_gather`, vendored exllamav3 v1.5.0
