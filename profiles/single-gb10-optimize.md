@@ -52,6 +52,7 @@ Logs: `work/logs/profile-{single-gb10,ngram}-20260919.log`,
 | fp8 KV (auto), chunked prefill, prefix caching | ON | vLLM defaults for this model |
 | max_num_seqs=64 (no spec) / 24 (spec) | ON | hybrid mamba block budget |
 | n-gram spec decode | CONDITIONAL | enable per workload (repetitive/code); measured both directions above |
+| GEMV fast path (`EXL3_GEMV`) | DEFAULT | already active via the kernel's heuristic; forcing mode 2 at m=1 changed nothing on GB10 (memory-bound here — the kernel's own note) and shifted numerics, so the heuristic stays. Microbench: `work/logs/gemv_bench-20260919.py` |
 | DFlash2 spec decode (M4) | NOT PORTED | the next big lever: 2.25x measured on the sibling lane, and unlike n-gram it helps all workloads |
 | Recon tier (experts > 256 rows) | NOT PORTED | very long prefills fall back to the per-expert loop; banded path covers counts <= 256 |
 | int8 GEMV (M2b) | NOT PORTED | dense-linears compute path; batch-1 decode is weight-traffic bound so the win is small |
