@@ -212,6 +212,7 @@ class Exl3LinearMethod(LinearMethodBase):
     ) -> None:
         rank = get_tensor_model_parallel_rank()
         world = get_tensor_model_parallel_world_size()
+        self._params_dtype = params_dtype
         self.is_row_parallel = input_size != input_size_per_partition
 
         if len(output_partition_sizes) != self.n_shards:
@@ -511,6 +512,34 @@ class Exl3LinearMethod(LinearMethodBase):
         if y.dtype != in_dtype:
             y = y.to(in_dtype)
         return y
+
+    def dense_weight(self) -> torch.Tensor:
+        """Materialize the dense [out, in] weight via the gemm path.
+
+        The DFlash2 drafter builds its fused context-KV buffers from
+        ``qkv_proj.weight``; a quantized layer has no dense weight, so
+        rebuild it once at load time by running the wired ``exl3_gemm`` on an
+        identity — the result is exactly the operator's dense equivalent
+        (fused reconstruct, scales and Hadamards folded).
+        """
+        ext = kernels.require()
+        parts = []
+        for i, g in enumerate(self._geom):
+            if g["dense"]:
+                parts.append(self._slot_tensor("weight", i))
+                continue
+            trellis = self._slot_tensor("trellis", i)
+            k_in = int(g["trellis"][0]) * 16
+            eye = torch.eye(k_in, dtype=torch.float16, device=trellis.device)
+            wt = ext.exl3_gemm(
+                eye, trellis,
+                self._slot_tensor("suh", i), self._slot_tensor("svh", i),
+                g["k"], g["mcg"], g["mul1"], g["n_out"],
+            )
+            parts.append(wt.t())
+        out = parts[0] if len(parts) == 1 else torch.cat(parts, dim=0)
+        dt = getattr(self, "_params_dtype", torch.float16)
+        return out.to(dt).contiguous()
 
     # -- internals -------------------------------------------------------
 
