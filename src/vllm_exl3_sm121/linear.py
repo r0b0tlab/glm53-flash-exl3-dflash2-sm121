@@ -44,6 +44,7 @@ standard loader, fed from the pack's `<name>.bias` tensor.
 from __future__ import annotations
 
 import functools
+import re
 from typing import Any
 
 import torch
@@ -89,6 +90,7 @@ class Exl3LinearMethod(LinearMethodBase):
     # vLLM merged layers whose pack keeps the halves split as EXL3 modules.
     FUSED_GROUPS = (
         (".gate_up_proj", (".gate_proj", ".up_proj")),
+        (".qkv_proj", (".q_proj", ".k_proj", ".v_proj")),
         (".fused_qkv_a_proj", (".q_a_proj", ".kv_a_proj_with_mqa")),
         (".wk_weights_proj", (".wk", ".weights_proj")),
     )
@@ -115,7 +117,17 @@ class Exl3LinearMethod(LinearMethodBase):
         if name.startswith("model."):
             # DFlash2 draft packs store bare names ("layers.0...", "fc")
             # while vLLM prefixes the draft model with "model.".
-            candidates.append(name[len("model."):])
+            bare = name[len("model."):]
+            candidates.append(bare)
+            # Draft layers are built with the target's layer offset in their
+            # prefix ("model.layers.45..49" for a 5-layer drafter on a
+            # 45-layer target) while the pack stores them 0-based.
+            off = getattr(qc, "draft_layer_offset", 0)
+            if off:
+                m = re.match(r"layers\.(\d+)(\..+)", bare)
+                if m and int(m.group(1)) >= off:
+                    candidates.append(
+                        f"layers.{int(m.group(1)) - off}{m.group(2)}")
         for cand in candidates:
             mq = qc.module_quant(cand)
             if mq is not None:
@@ -397,6 +409,15 @@ class Exl3LinearMethod(LinearMethodBase):
                   loaded_weight: torch.Tensor, *args: Any, **kwargs: Any) -> None:
         """Load one pack shard tensor into its slot, TP-sliced."""
         sid = kwargs.get("loaded_shard_id", args[0] if args else None)
+        if (
+            isinstance(sid, str)
+            and sid in ("q", "k", "v")
+            and self.n_shards == 3
+            and not self._qkv_split
+        ):
+            # Stacked q/k/v pieces (DFlash2 draft fused qkv_proj) arrive with
+            # string shard ids; map them onto the three EXL3 slots.
+            sid = {"q": 0, "k": 1, "v": 2}[sid]
         if sid is None and self._qkv_split and suffix != "weight":
             self._load_qkv_fused(suffix, loaded_weight)
             return

@@ -19,6 +19,7 @@ from typing import Any
 
 import json
 import os
+import re
 
 import torch
 
@@ -43,6 +44,10 @@ class Exl3Config(QuantizationConfig):
         super().__init__()
         self.pack = pack
         self.inline = inline or {}
+        # DFlash2 drafts: vLLM numbers draft layers with the target's layer
+        # offset (start_layer_id = target num_hidden_layers) while packs store
+        # them 0-based. Filled in by maybe_update_config.
+        self.draft_layer_offset = 0
 
     # -- vLLM QuantizationConfig interface -------------------------------
 
@@ -86,6 +91,41 @@ class Exl3Config(QuantizationConfig):
                 f"tensor_storage); point --model at the pack directory")
         with open(cand) as fh:
             self.pack = meta.parse_pack(json.load(fh))
+        self._compute_draft_layer_offset(model_name)
+
+    def _compute_draft_layer_offset(self, model_name: str) -> None:
+        """Detect a DFlash2 draft pack whose layers are stored 0-based.
+
+        vLLM constructs draft layers with prefix ``layers.{target_offset + i}``
+        (start_layer_id = the target's num_hidden_layers) while exllamav3 packs
+        store them at ``layers.{i}``. The draft's config.json carries
+        ``dflash_config.num_target_layers``; record the shift so the linear
+        lookup can bridge it.
+        """
+        self.draft_layer_offset = 0
+        cfgp = os.path.join(model_name, "config.json")
+        if not os.path.isfile(cfgp):
+            return
+        try:
+            with open(cfgp) as fh:
+                cfg = json.load(fh)
+        except (OSError, ValueError):
+            return
+        dflash = cfg.get("dflash_config")
+        if not isinstance(dflash, dict):
+            return
+        off = dflash.get("num_target_layers")
+        if not isinstance(off, int) or off <= 0:
+            return
+        idx = {
+            int(m.group(1))
+            for name in self.pack.modules
+            if (m := re.match(r"layers\.(\d+)\.", name))
+        }
+        # Only when the pack really is 0-based (a pack already numbered with
+        # the offset needs no shift).
+        if idx and min(idx) == 0 and off not in idx:
+            self.draft_layer_offset = off
 
     def get_quant_method(
         self, layer: torch.nn.Module, prefix: str
