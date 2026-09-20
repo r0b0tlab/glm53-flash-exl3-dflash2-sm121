@@ -38,11 +38,13 @@ from ×2 through ×16.
 
 Provenance of the comparison rows (public sources, 2026-09-20):
 - MiaAI-Lab ladder: their published **code-mode** table for the 2026-08-31 config
-  (1M ctx, MNBT 2048, MAX_NUM_SEQS 16, gate-v2 512, 50K ctx per lane); their repo
+  (1M ctx, MNBT 2048, MAX_NUM_SEQS 16, gate-v2 512, 50K ctx per lane);
+  https://github.com/MiaAI-Lab/GLM-5.3-Flash-EXL3-2x-DGX-Sparks — their repo
   notes it as a historical measurement of that configuration. Single-stream code
   35–44 / prose ~18 from their current README.
 - Single-Spark recipe: the published forum figures for EXL3 2.05bpw + DFlash2
-  K=7 on one GB10 (structured 64 / prose 25 / C4 ~182 active-stream).
+  K=7 on one GB10 (structured 64 / prose 25 / C4 ~182 active-stream);
+  https://forums.developer.nvidia.com/t/60-tok-s-glm-5-3-flash-on-a-single-dgx-spark/382140
 - This engine's rows: `work/logs/bench-class-k5.{log,json}` (2026-09-20).
 
 ## K choice (both measured, same serve flags)
