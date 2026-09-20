@@ -1,0 +1,25 @@
+[bench-k5] structured rep0: 634 tok in 12.3s = 51.42 tok/s (reason=8 finish=stop)
+[bench-k5] structured rep1: 644 tok in 13.2s = 48.61 tok/s (reason=15 finish=stop)
+[bench-k5] structured rep2: 637 tok in 12.5s = 50.82 tok/s (reason=8 finish=stop)
+[bench-k5] structured rep3: 637 tok in 12.7s = 50.23 tok/s (reason=8 finish=stop)
+[bench-k5] structured rep4: 637 tok in 12.8s = 49.84 tok/s (reason=8 finish=stop)
+[bench-k5] structured MEDIAN: 50.23 tok/s
+[bench-k5] code rep0: 425 tok in 9.9s = 43.05 tok/s (reason=4 finish=stop)
+[bench-k5] code rep1: 425 tok in 9.8s = 43.40 tok/s (reason=4 finish=stop)
+[bench-k5] code rep2: 382 tok in 8.4s = 45.71 tok/s (reason=0 finish=stop)
+[bench-k5] code rep3: 399 tok in 9.7s = 40.99 tok/s (reason=4 finish=stop)
+[bench-k5] code rep4: 382 tok in 8.3s = 45.82 tok/s (reason=0 finish=stop)
+[bench-k5] code MEDIAN: 43.40 tok/s
+[bench-k5] prose rep0: 255 tok in 13.1s = 19.51 tok/s (reason=8 finish=stop)
+[bench-k5] prose rep1: 276 tok in 13.3s = 20.77 tok/s (reason=8 finish=stop)
+[bench-k5] prose rep2: 233 tok in 12.4s = 18.85 tok/s (reason=0 finish=stop)
+[bench-k5] prose rep3: 271 tok in 14.1s = 19.26 tok/s (reason=0 finish=stop)
+[bench-k5] prose rep4: 275 tok in 13.8s = 19.87 tok/s (reason=0 finish=stop)
+[bench-k5] prose MEDIAN: 19.51 tok/s
+[bench-k5] C1: 256 tok in 5.5s = 46.8 agg
+[bench-k5] C2: 512 tok in 8.3s = 61.7 agg
+[bench-k5] C4: 1024 tok in 15.4s = 66.5 agg
+[bench-k5] C6: 1536 tok in 23.3s = 65.9 agg
+[bench-k5] C8: 2048 tok in 30.7s = 66.6 agg
+[bench-k5] C16: 4096 tok in 61.0s = 67.1 agg
+[bench-k5] CLASS_DONE

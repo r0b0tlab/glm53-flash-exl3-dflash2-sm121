@@ -1,0 +1,271 @@
+Running as unit: exl3-serve-122503.scope; invocation ID: b348749219ae4b228958a5e0eb752e2f
+(APIServer pid=2279389) INFO 09-20 12:25:12 [api_utils.py:347] 
+(APIServer pid=2279389) INFO 09-20 12:25:12 [api_utils.py:347]        █     █     █▄   ▄█
+(APIServer pid=2279389) INFO 09-20 12:25:12 [api_utils.py:347]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.30.0rc1
+(APIServer pid=2279389) INFO 09-20 12:25:12 [api_utils.py:347]   █▄█▀ █     █     █     █  model   /home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3
+(APIServer pid=2279389) INFO 09-20 12:25:12 [api_utils.py:347]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=2279389) INFO 09-20 12:25:12 [api_utils.py:347] 
+(APIServer pid=2279389) INFO 09-20 12:25:12 [api_utils.py:286] non-default args: {'model_tag': '/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3', 'host': '127.0.0.1', 'model': '/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3', 'trust_remote_code': True, 'max_model_len': 32768, 'quantization': 'exl3', 'served_model_name': ['glm53-flash-exl3-dflash2'], 'reasoning_parser': 'glm47', 'gpu_memory_utilization': 0.85, 'max_num_seqs': 16, 'speculative_config': {'method': 'dflash', 'model': '/home/r0b0tdgx/models/glm-5.3-flash-dflash2/exl3-3.00bpw', 'num_speculative_tokens': 4}, 'compilation_config': {'mode': None, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': [], 'ir_enable_torch_wrap': None, 'splitting_ops': None, 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': None, 'compile_ranges_endpoints': None, 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': None, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': None, 'pass_config': {}, 'max_cudagraph_capture_size': None, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': None, 'static_all_moe_layers': []}}
+(APIServer pid=2279389) INFO 09-20 12:25:12 [model.py:692] Resolved architecture: Glm5NextForConditionalGeneration
+(APIServer pid=2279389) INFO 09-20 12:25:12 [model.py:2030] Using max model len 32768
+(APIServer pid=2279389) WARNING 09-20 12:25:12 [indexer_topk.py:29] Failed to import the DeepSelect extension (vllm._deepselect_C): No module named 'vllm._deepselect_C'
+(APIServer pid=2279389) INFO 09-20 12:25:14 [model.py:692] Resolved architecture: DFlash2DraftModel
+(APIServer pid=2279389) INFO 09-20 12:25:14 [model.py:2030] Using max model len 1048576
+(APIServer pid=2279389) INFO 09-20 12:25:14 [speculative.py:1651] Overriding draft model max model len from 1048576 to 32768
+(APIServer pid=2279389) INFO 09-20 12:25:14 [config.py:625] Mamba cache mode is set to 'align' for Glm5NextForConditionalGeneration by default when prefix caching is enabled
+(APIServer pid=2279389) INFO 09-20 12:25:15 [vllm.py:762] Auto-enabling VLLM_USE_BREAKABLE_CUDAGRAPH=1. Set VLLM_USE_BREAKABLE_CUDAGRAPH=0 to opt out.
+(APIServer pid=2279389) INFO 09-20 12:25:15 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+(APIServer pid=2279389) WARNING 09-20 12:25:15 [vllm.py:2135] max_num_scheduled_tokens is set to 2048 based on the speculative decoding settings. This may lead to suboptimal performance. Consider increasing max_num_batched_tokens to accommodate the additional draft token slots, or decrease num_speculative_tokens.
+(APIServer pid=2279389) INFO 09-20 12:25:15 [compilation.py:336] Enabled custom fusions: norm_quant, act_quant
+(APIServer pid=2279389) [transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+(EngineCore pid=2279535) INFO 09-20 12:25:22 [core.py:123] Initializing a V1 LLM engine (v0.30.0rc1) with config: model='/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3', speculative_config=SpeculativeConfig(method='dflash', model='/home/r0b0tdgx/models/glm-5.3-flash-dflash2/exl3-3.00bpw', num_spec_tokens=4), tokenizer='/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=32768, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=exl3, quantization_config=None, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='glm47', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=glm53-flash-exl3-dflash2, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [2048], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 16, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, enable_jit_warmup=True, moe_backend='auto', sparse_indexer_topk_backend='auto', linear_backend='auto', linear_backend_per_quant=None)
+(EngineCore pid=2279535) WARNING 09-20 12:25:22 [indexer_topk.py:29] Failed to import the DeepSelect extension (vllm._deepselect_C): No module named 'vllm._deepselect_C'
+(APIServer pid=2279389) INFO 09-20 12:25:23 [base.py:261] Multi-modal warmup completed in 1.438s
+(EngineCore pid=2279535) INFO 09-20 12:25:24 [parallel_state.py:1827] world_size=1 rank=0 local_rank=0 distributed_init_method=file:///tmp/vllm_dist_cc080b99fabd4f2b88c8ab75523b06c7 backend=nccl
+(EngineCore pid=2279535) INFO 09-20 12:25:24 [parallel_state.py:2267] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, ETP rank 0, EP rank 0, EPLB rank N/A
+(EngineCore pid=2279535) INFO 09-20 12:25:24 [gpu_worker.py:441] Using V2 Model Runner
+(APIServer pid=2279389) INFO 09-20 12:25:24 [base.py:261] Readonly multi-modal warmup completed in 1.764s
+(EngineCore pid=2279535) INFO 09-20 12:25:24 [model_runner.py:396] Loading model from scratch...
+(EngineCore pid=2279535) INFO 09-20 12:25:25 [cuda.py:601] Using backend AttentionBackendEnum.FLASH_ATTN for vit attention
+(EngineCore pid=2279535) INFO 09-20 12:25:25 [mm_encoder_attention.py:372] Using AttentionBackendEnum.FLASH_ATTN for MMEncoderAttention.
+(EngineCore pid=2279535) INFO 09-20 12:25:25 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+(EngineCore pid=2279535) WARNING 09-20 12:25:25 [vllm.py:2135] max_num_scheduled_tokens is set to 2048 based on the speculative decoding settings. This may lead to suboptimal performance. Consider increasing max_num_batched_tokens to accommodate the additional draft token slots, or decrease num_speculative_tokens.
+(EngineCore pid=2279535) INFO 09-20 12:25:25 [compilation.py:336] Enabled custom fusions: norm_quant, act_quant
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.0.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.0.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.1.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.1.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.2.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.2.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.3.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) INFO 09-20 12:25:26 [cuda.py:542] Using FLASHINFER_MLA_SPARSE_SM90 attention backend out of potential backends: ['FLASHINFER_MLA_SPARSE_SM90', 'FLASHINFER_MLA_SPARSE_SM120'].
+(EngineCore pid=2279535) INFO 09-20 12:25:27 [selector.py:194] Using FLASH_ATTN MLA prefill backend.
+(EngineCore pid=2279535) INFO 09-20 12:25:27 [deep_gemm.py:192] deep_gemm not found in site-packages, trying vendored vllm.third_party.deep_gemm
+(EngineCore pid=2279535) INFO 09-20 12:25:27 [deep_gemm.py:219] DeepGEMM PDL enabled on vllm.third_party.deep_gemm.
+(EngineCore pid=2279535) INFO 09-20 12:25:27 [deep_gemm.py:136] DeepGEMM E8M0 enabled on current platform.
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.4.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.4.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.5.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.5.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.6.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.6.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.7.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.8.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.8.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.9.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.9.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.10.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.10.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.11.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.12.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.12.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.13.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.13.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.14.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.14.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.15.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.16.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.16.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.17.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.17.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.18.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.18.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.19.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.20.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.20.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.21.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.21.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.22.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.22.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.23.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.24.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.24.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.25.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.25.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.26.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.26.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.27.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.28.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.28.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.29.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.29.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.30.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.30.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.31.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.32.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.32.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.33.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.33.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.34.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.34.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.35.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.36.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.36.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.37.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.37.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.38.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.38.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.39.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.40.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.40.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.41.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.41.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.42.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.42.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.43.self_attn.kv_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.44.self_attn.f_b_proj — dense load
+(EngineCore pid=2279535) exl3: no pack entry for language_model.model.layers.44.self_attn.g_b_proj — dense load
+(EngineCore pid=2279535) INFO 09-20 12:25:32 [weight_utils.py:895] Filesystem type for checkpoints: EXT4. Checkpoint size: 91.67 GiB. Available RAM: 19.98 GiB.
+(EngineCore pid=2279535) INFO 09-20 12:25:32 [weight_utils.py:925] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre) and the checkpoint size (91.67 GiB) exceeds 90% of available RAM (19.98 GiB).
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:   0% Completed | 0/31 [00:00<?, ?it/s]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:   3% Completed | 1/31 [00:11<05:37, 11.23s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:   6% Completed | 2/31 [00:31<07:57, 16.48s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  10% Completed | 3/31 [00:52<08:35, 18.42s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  13% Completed | 4/31 [01:13<08:44, 19.41s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  16% Completed | 5/31 [01:39<09:32, 22.00s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  19% Completed | 6/31 [02:03<09:27, 22.71s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  23% Completed | 7/31 [02:29<09:25, 23.58s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  26% Completed | 8/31 [02:54<09:14, 24.12s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  29% Completed | 9/31 [03:13<08:15, 22.54s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  32% Completed | 10/31 [03:36<07:57, 22.75s/it]
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  35% Completed | 11/31 [04:01<07:47, 23.37s/it]
+(EngineCore pid=2279535) Process EngineCore:
+(EngineCore pid=2279535) Traceback (most recent call last):
+(EngineCore pid=2279535)   File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+(EngineCore pid=2279535)     self.run()
+(EngineCore pid=2279535)   File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
+(EngineCore pid=2279535)     self._target(*self._args, **self._kwargs)
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/core.py", line 1328, in run_engine_core
+(EngineCore pid=2279535)     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=2279535)                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2279535)     return func(*args, **kwargs)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/core.py", line 1085, in __init__
+(EngineCore pid=2279535)     super().__init__(
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/core.py", line 134, in __init__
+(EngineCore pid=2279535)     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=2279535)                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2279535)     return func(*args, **kwargs)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/executor/abstract.py", line 110, in __init__
+(EngineCore pid=2279535)     self._init_executor()
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/executor/uniproc_executor.py", line 74, in _init_executor
+(EngineCore pid=2279535)     self.driver_worker.load_model()
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/worker/gpu_worker.py", line 507, in load_model
+(EngineCore pid=2279535)     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/worker/gpu/model_runner.py", line 400, in load_model
+(EngineCore pid=2279535)     self.model = model_loader.load_model(
+(EngineCore pid=2279535)                  ^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2279535)     return func(*args, **kwargs)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/model_loader/base_loader.py", line 75, in load_model
+(EngineCore pid=2279535)     self.load_weights(model, model_config)
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2279535)     return func(*args, **kwargs)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/model_loader/default_loader.py", line 427, in load_weights
+(EngineCore pid=2279535)     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(EngineCore pid=2279535)                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/models/glm4_1v.py", line 2370, in load_weights
+(EngineCore pid=2279535)     return loader.load_weights(weights, mapper=self.hf_to_vllm_mapper)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(EngineCore pid=2279535)     return original_load_weights(self, weights, *args, **kwargs)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/models/utils.py", line 445, in load_weights
+(EngineCore pid=2279535)     autoloaded_weights = set(self._load_module("", self.module, weights))
+(EngineCore pid=2279535)                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/models/utils.py", line 382, in _load_module
+(EngineCore pid=2279535)     yield from self._load_module(
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/models/utils.py", line 359, in _load_module
+(EngineCore pid=2279535)     loaded_params = module_load_weights(weights)
+(EngineCore pid=2279535)                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/models/glm5next/nvidia/model.py", line 1109, in load_weights
+(EngineCore pid=2279535)     return loader.load_weights(weights)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(EngineCore pid=2279535)     return original_load_weights(self, weights, *args, **kwargs)
+(EngineCore pid=2279535)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/models/utils.py", line 445, in load_weights
+(EngineCore pid=2279535)     autoloaded_weights = set(self._load_module("", self.module, weights))
+(EngineCore pid=2279535)                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/models/utils.py", line 382, in _load_module
+(EngineCore pid=2279535)     yield from self._load_module(
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/model_executor/models/utils.py", line 359, in _load_module
+(EngineCore pid=2279535)     loaded_params = module_load_weights(weights)
+(EngineCore pid=2279535)                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/models/glm5next/nvidia/model.py", line 983, in load_weights
+(EngineCore pid=2279535)     success = weight_loader(
+(EngineCore pid=2279535)               ^^^^^^^^^^^^^^
+(EngineCore pid=2279535)   File "/home/r0b0tdgx/vllm-exl3-sm121/src/vllm_exl3_sm121/moe.py", line 169, in _load_one
+(EngineCore pid=2279535)     param.data[e, s].copy_(loaded_weight)
+(EngineCore pid=2279535) KeyboardInterrupt
+(EngineCore pid=2279535) Loading safetensors checkpoint shards:  35% Completed | 11/31 [04:05<07:26, 22.34s/it]
+(EngineCore pid=2279535) 
+[rank0]:[W920 12:29:39.811342817 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+(APIServer pid=2279389) INFO 09-20 12:29:41 [utils.py:632] [shutdown] Process manager: send sigterm to process EngineCore
+(APIServer pid=2279389) Traceback (most recent call last):
+(APIServer pid=2279389)   File "/home/r0b0tdgx/venvs/exl3_sm121/bin/vllm", line 6, in <module>
+(APIServer pid=2279389)     sys.exit(main())
+(APIServer pid=2279389)              ^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/entrypoints/cli/main.py", line 106, in main
+(APIServer pid=2279389)     args.dispatch_function(args)
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/entrypoints/cli/serve.py", line 154, in cmd
+(APIServer pid=2279389)     uvloop.run(run_server(args))
+(APIServer pid=2279389)   File "/home/r0b0tdgx/venvs/exl3_sm121/lib/python3.12/site-packages/uvloop/__init__.py", line 96, in run
+(APIServer pid=2279389)     return __asyncio.run(
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+(APIServer pid=2279389)     return runner.run(main)
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+(APIServer pid=2279389)     return self._loop.run_until_complete(task)
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+(APIServer pid=2279389)   File "/home/r0b0tdgx/venvs/exl3_sm121/lib/python3.12/site-packages/uvloop/__init__.py", line 48, in wrapper
+(APIServer pid=2279389)     return await main
+(APIServer pid=2279389)            ^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/entrypoints/launchers/api_server/entry.py", line 176, in run_server
+(APIServer pid=2279389)     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/entrypoints/launchers/api_server/entry.py", line 190, in run_server_worker
+(APIServer pid=2279389)     async with build_async_engine_client(
+(APIServer pid=2279389)   File "/usr/lib/python3.12/contextlib.py", line 210, in __aenter__
+(APIServer pid=2279389)     return await anext(self.gen)
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/entrypoints/launchers/api_server/entry.py", line 58, in build_async_engine_client
+(APIServer pid=2279389)     async with build_async_engine_client_from_engine_args(
+(APIServer pid=2279389)   File "/usr/lib/python3.12/contextlib.py", line 210, in __aenter__
+(APIServer pid=2279389)     return await anext(self.gen)
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/entrypoints/launchers/api_server/entry.py", line 94, in build_async_engine_client_from_engine_args
+(APIServer pid=2279389)     async_llm = AsyncLLM.from_vllm_config(
+(APIServer pid=2279389)                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/async_llm.py", line 235, in from_vllm_config
+(APIServer pid=2279389)     return cls(
+(APIServer pid=2279389)            ^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/async_llm.py", line 169, in __init__
+(APIServer pid=2279389)     self.engine_core = EngineCoreClient.make_async_mp_client(
+(APIServer pid=2279389)                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=2279389)     return func(*args, **kwargs)
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/core_client.py", line 163, in make_async_mp_client
+(APIServer pid=2279389)     return AsyncMPClient(
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=2279389)     return func(*args, **kwargs)
+(APIServer pid=2279389)            ^^^^^^^^^^^^^^^^^^^^^
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/core_client.py", line 1060, in __init__
+(APIServer pid=2279389)     super().__init__(
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/core_client.py", line 656, in __init__
+(APIServer pid=2279389)     with launch_core_engines(
+(APIServer pid=2279389)   File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__
+(APIServer pid=2279389)     next(self.gen)
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/utils.py", line 1240, in launch_core_engines
+(APIServer pid=2279389)     wait_for_engine_startup(
+(APIServer pid=2279389)   File "/home/r0b0tdgx/vllm-exl3-sm121/work/vllm/vllm/v1/engine/utils.py", line 1320, in wait_for_engine_startup
+(APIServer pid=2279389)     raise RuntimeError(
+(APIServer pid=2279389) RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}

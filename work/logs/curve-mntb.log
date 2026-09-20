@@ -1,0 +1,12 @@
+[curve-mntb] canary finish=stop 45 tok in 1.3s
+[curve-mntb] c1 rep0: 1912 tok in 61.4s = 31.14 tok/s
+[curve-mntb] c1 rep1: 2048 tok in 71.5s = 28.65 tok/s
+[curve-mntb] c1 rep2: 1388 tok in 45.1s = 30.74 tok/s
+[curve-mntb] c1 rep3: 1521 tok in 50.0s = 30.45 tok/s
+[curve-mntb] c1 rep4: 1446 tok in 49.7s = 29.11 tok/s
+[curve-mntb] C1: 256 tok in 10.8s = 23.7 agg (23.67/stream) finish=['length']
+[curve-mntb] C2: 512 tok in 13.7s = 37.5 agg (18.74/stream) finish=['length']
+[curve-mntb] C4: 1024 tok in 27.4s = 37.3 agg (9.33/stream) finish=['length']
+[curve-mntb] C8: 2048 tok in 54.1s = 37.8 agg (4.73/stream) finish=['length']
+[curve-mntb] C16: 3284 tok in 88.2s = 37.3 agg (2.33/stream) finish=['abort', 'length']
+[curve-mntb] CURVE_DONE c1_median=30.45 C16=37.3

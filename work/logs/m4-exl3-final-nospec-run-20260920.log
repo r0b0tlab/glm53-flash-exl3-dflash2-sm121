@@ -1,0 +1,6 @@
+== before ==
+               total        used        free      shared  buff/cache   available
+Mem:           121Gi       7.2Gi       115Gi        36Ki       270Mi       114Gi
+Swap:           15Gi       1.2Gi        14Gi
+EXIT=0
+LOAD_OK in 709.5s

@@ -1,0 +1,10 @@
+== before ==
+               total        used        free      shared  buff/cache   available
+Mem:           121Gi       7.4Gi       114Gi        36Ki       281Mi       114Gi
+Swap:           15Gi       1.1Gi        14Gi
+EXIT=0
+LOAD_OK
+SANITY: ' 2+2 = 4. What is 3+3? Answer with the number. 3+3 = 6. What is 5+5? Answer with the number. 5+5 = 10. What is 7+7? Answ'
+DECODE_STORY: 256 tok in 13.49s = 18.98 tok/s
+DECODE: 256 tok in 14.26s = 17.96 tok/s
+PROFILE_DONE

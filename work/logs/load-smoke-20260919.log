@@ -1,0 +1,194 @@
+Running as unit: exl3-load-120847.scope; invocation ID: b032fc4ec0674a4ab35e71b79e8291e5
+INFO 09-19 12:08:57 [api_utils.py:286] non-default args: {'trust_remote_code': True, 'max_model_len': 4096, 'gpu_memory_utilization': 0.85, 'disable_log_stats': True, 'quantization': 'exl3', 'enforce_eager': True, 'model': '/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3'}
+INFO 09-19 12:08:57 [model.py:692] Resolved architecture: Glm5NextForConditionalGeneration
+INFO 09-19 12:08:57 [model.py:2030] Using max model len 4096
+WARNING 09-19 12:08:57 [model.py:994] Model does not support mm_device_do_normalize, forcing mm_device_do_normalize = False.
+WARNING 09-19 12:08:57 [indexer_topk.py:29] Failed to import the DeepSelect extension (vllm._deepselect_C): No module named 'vllm._deepselect_C'
+INFO 09-19 12:08:59 [scheduler.py:288] Chunked prefill is enabled with max_num_batched_tokens=8192.
+INFO 09-19 12:08:59 [config.py:625] Mamba cache mode is set to 'align' for Glm5NextForConditionalGeneration by default when prefix caching is enabled
+WARNING 09-19 12:09:00 [vllm.py:1547] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+INFO 09-19 12:09:00 [vllm.py:762] Auto-enabling VLLM_USE_BREAKABLE_CUDAGRAPH=1. Set VLLM_USE_BREAKABLE_CUDAGRAPH=0 to opt out.
+INFO 09-19 12:09:00 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+INFO 09-19 12:09:00 [vllm.py:1780] Cudagraph is disabled under eager mode
+INFO 09-19 12:09:00 [compilation.py:336] Enabled custom fusions: norm_quant, act_quant
+[transformers] The following generation flags are not valid and may be ignored: ['top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+WARNING 09-19 12:09:02 [system_utils.py:157] We must use the `spawn` multiprocessing start method. Overriding VLLM_WORKER_MULTIPROC_METHOD to 'spawn'. See https://docs.vllm.ai/en/latest/usage/troubleshooting.html#python-multiprocessing for more information. Reasons: CUDA is initialized
+(EngineCore pid=1473664) INFO 09-19 12:09:08 [core.py:123] Initializing a V1 LLM engine (v0.30.0rc1) with config: model='/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3', speculative_config=None, tokenizer='/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=4096, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=exl3, quantization_config=None, enforce_eager=True, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': [], 'compile_ranges_endpoints': [8192], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': 0, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, enable_jit_warmup=True, moe_backend='auto', sparse_indexer_topk_backend='auto', linear_backend='auto', linear_backend_per_quant=None)
+(EngineCore pid=1473664) WARNING 09-19 12:09:09 [indexer_topk.py:29] Failed to import the DeepSelect extension (vllm._deepselect_C): No module named 'vllm._deepselect_C'
+INFO 09-19 12:09:09 [base.py:261] Multi-modal warmup completed in 1.325s
+(EngineCore pid=1473664) INFO 09-19 12:09:10 [parallel_state.py:1827] world_size=1 rank=0 local_rank=0 distributed_init_method=file:///tmp/vllm_dist_40156fb825004e81a6d71137ea371319 backend=nccl
+(EngineCore pid=1473664) INFO 09-19 12:09:10 [parallel_state.py:2267] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, ETP rank 0, EP rank 0, EPLB rank N/A
+(EngineCore pid=1473664) INFO 09-19 12:09:10 [gpu_worker.py:441] Using V2 Model Runner
+INFO 09-19 12:09:10 [base.py:261] Readonly multi-modal warmup completed in 1.517s
+(EngineCore pid=1473664) INFO 09-19 12:09:11 [model_runner.py:396] Loading model from scratch...
+(EngineCore pid=1473664) INFO 09-19 12:09:11 [cuda.py:601] Using backend AttentionBackendEnum.FLASH_ATTN for vit attention
+(EngineCore pid=1473664) INFO 09-19 12:09:11 [mm_encoder_attention.py:372] Using AttentionBackendEnum.FLASH_ATTN for MMEncoderAttention.
+(EngineCore pid=1473664) WARNING 09-19 12:09:11 [vllm.py:1547] Enforce eager set, disabling torch.compile and CUDAGraphs. This is equivalent to setting -cc.mode=none -cc.cudagraph_mode=none
+(EngineCore pid=1473664) INFO 09-19 12:09:11 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+(EngineCore pid=1473664) INFO 09-19 12:09:11 [vllm.py:1780] Cudagraph is disabled under eager mode
+(EngineCore pid=1473664) INFO 09-19 12:09:11 [compilation.py:336] Enabled custom fusions: norm_quant, act_quant
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.0.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.0.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.1.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.1.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.2.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.2.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.3.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) INFO 09-19 12:09:13 [cuda.py:542] Using FLASHINFER_MLA_SPARSE_SM90 attention backend out of potential backends: ['FLASHINFER_MLA_SPARSE_SM90', 'FLASHINFER_MLA_SPARSE_SM120'].
+(EngineCore pid=1473664) INFO 09-19 12:09:13 [selector.py:194] Using FLASH_ATTN MLA prefill backend.
+(EngineCore pid=1473664) INFO 09-19 12:09:13 [deep_gemm.py:192] deep_gemm not found in site-packages, trying vendored vllm.third_party.deep_gemm
+(EngineCore pid=1473664) INFO 09-19 12:09:13 [deep_gemm.py:219] DeepGEMM PDL enabled on vllm.third_party.deep_gemm.
+(EngineCore pid=1473664) INFO 09-19 12:09:13 [deep_gemm.py:136] DeepGEMM E8M0 enabled on current platform.
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.4.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.4.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.5.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.5.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.6.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.6.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.7.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.8.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.8.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.9.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.9.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.10.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.10.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.11.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.12.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.12.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.13.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.13.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.14.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.14.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.15.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.16.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.16.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.17.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.17.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.18.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.18.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.19.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.20.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.20.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.21.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.21.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.22.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.22.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.23.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.24.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.24.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.25.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.25.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.26.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.26.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.27.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.28.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.28.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.29.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.29.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.30.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.30.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.31.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.32.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.32.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.33.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.33.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.34.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.34.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.35.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.36.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.36.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.37.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.37.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.38.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.38.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.39.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.40.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.40.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.41.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.41.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.42.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.42.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.43.self_attn.kv_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.44.self_attn.f_b_proj — dense load
+(EngineCore pid=1473664) exl3: no pack entry for language_model.model.layers.44.self_attn.g_b_proj — dense load
+(EngineCore pid=1473664) INFO 09-19 12:09:19 [weight_utils.py:895] Filesystem type for checkpoints: EXT4. Checkpoint size: 91.67 GiB. Available RAM: 18.12 GiB.
+(EngineCore pid=1473664) INFO 09-19 12:09:19 [weight_utils.py:925] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre) and the checkpoint size (91.67 GiB) exceeds 90% of available RAM (18.12 GiB).
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:   0% Completed | 0/31 [00:00<?, ?it/s]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:   3% Completed | 1/31 [00:10<05:20, 10.67s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:   6% Completed | 2/31 [00:29<07:24, 15.33s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  10% Completed | 3/31 [00:46<07:27, 15.99s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  13% Completed | 4/31 [01:03<07:32, 16.74s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  16% Completed | 5/31 [01:29<08:42, 20.08s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  19% Completed | 6/31 [01:55<09:12, 22.11s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  23% Completed | 7/31 [02:22<09:29, 23.71s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  26% Completed | 8/31 [02:49<09:28, 24.70s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  29% Completed | 9/31 [03:09<08:32, 23.29s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  32% Completed | 10/31 [03:37<08:35, 24.53s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  35% Completed | 11/31 [04:03<08:20, 25.00s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  39% Completed | 12/31 [04:30<08:04, 25.50s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  42% Completed | 13/31 [04:56<07:45, 25.86s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  45% Completed | 14/31 [05:11<06:21, 22.42s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  48% Completed | 15/31 [05:30<05:43, 21.48s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  52% Completed | 16/31 [05:56<05:41, 22.78s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  55% Completed | 17/31 [06:23<05:37, 24.10s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  58% Completed | 18/31 [06:50<05:23, 24.90s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  61% Completed | 19/31 [07:16<05:04, 25.37s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  65% Completed | 20/31 [07:35<04:19, 23.55s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  68% Completed | 21/31 [08:03<04:08, 24.80s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  71% Completed | 22/31 [08:28<03:42, 24.76s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  74% Completed | 23/31 [08:41<02:50, 21.30s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  77% Completed | 24/31 [09:00<02:24, 20.66s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  81% Completed | 25/31 [09:20<02:02, 20.35s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  84% Completed | 26/31 [09:40<01:41, 20.38s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  87% Completed | 27/31 [10:01<01:21, 20.46s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  90% Completed | 28/31 [10:21<01:01, 20.42s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  94% Completed | 29/31 [10:46<00:43, 21.61s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards:  97% Completed | 30/31 [10:50<00:16, 16.44s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards: 100% Completed | 31/31 [10:54<00:00, 12.78s/it]
+(EngineCore pid=1473664) Loading safetensors checkpoint shards: 100% Completed | 31/31 [10:54<00:00, 21.12s/it]
+(EngineCore pid=1473664) 
+(EngineCore pid=1473664) INFO 09-19 12:20:14 [default_loader.py:430] Loading weights took 654.92 seconds
+(EngineCore pid=1473664) INFO 09-19 12:20:27 [model_runner.py:428] Model loading took 89.0 GiB memory and 675.962838 seconds
+(EngineCore pid=1473664) INFO 09-19 12:20:27 [topk_topp_sampler.py:78] Using FlashInfer for top-p & top-k sampling.
+(EngineCore pid=1473664) INFO 09-19 12:20:27 [interface.py:635] Setting kv cache block size to 64 for DEEPSEEK_V32_INDEXER backend.
+(EngineCore pid=1473664) INFO 09-19 12:20:27 [interface.py:933] Setting attention block size to 4352 tokens to ensure that attention page size is >= mamba page size.
+(EngineCore pid=1473664) INFO 09-19 12:20:27 [interface.py:957] Padding mamba page size by 2.64% to ensure that mamba page size and attention page size are exactly equal.
+(EngineCore pid=1473664) INFO 09-19 12:20:27 [utils.py:320] Using LBHNC KV cache layout.
+(EngineCore pid=1473664) INFO 09-19 12:20:29 [encoder_runner.py:131] Encoder cache will be initialized with a budget of 32242 tokens, and profiled with 1 video items of the maximum feature size.
+(EngineCore pid=1473664) INFO 09-19 12:20:53 [gpu_worker.py:640] Available KV cache memory: 10.39 GiB
+(EngineCore pid=1473664) INFO 09-19 12:20:53 [kv_cache_utils.py:2395] GPU KV cache size: 90,112 tokens, Maximum concurrency for 4,096 tokens per request: 22.00x
+(EngineCore pid=1473664) INFO 09-19 12:20:53 [indexer.py:813] DSA indexer decode path: use_flattening=False supports_varlen=False (next_n=1, use_fp4_cache=False)
+(EngineCore pid=1473664) INFO 09-19 12:20:54 [kernel_warmup.py:172] JIT kernel warmup starting.
+(EngineCore pid=1473664) JIT kernel warmup (16 compile keys):   0%|          | 0/4 [00:00<?, ?kernel/s]JIT kernel warmup (16 compile keys):  50%|█████     | 2/4 [00:00<00:00,  2.66kernel/s, MhcPreBigFuseTileLangKernel (12 keys)]JIT kernel warmup (16 compile keys): 100%|██████████| 4/4 [00:00<00:00,  5.19kernel/s, MhcFusedTileLangKernel (2 keys)]      
+(EngineCore pid=1473664) INFO 09-19 12:20:55 [kernel_warmup.py:185] JIT kernel warmup finished in 0.95s.
+(EngineCore pid=1473664) INFO 09-19 12:20:55 [mamba_triton_warmup.py:42] Warmed Mamba batch_memcpy_kernel.
+(EngineCore pid=1473664) INFO 09-19 12:20:55 [kernel_warmup.py:95] Warming up ll_bf16 router GEMM kernels for shapes: ((4096, 288),).
+(EngineCore pid=1473664) INFO 09-19 12:20:57 [kernel_warmup.py:438] Using FlashInfer autotune cache file: /home/r0b0tdgx/.cache/vllm/flashinfer_autotune_cache/0.6.18.post1/121a/35871c38610508f852b28b0359439cf661198e9ee227ce6f5f478c60db9ba472/autotune_configs.json
+(EngineCore pid=1473664) 2026-09-19 12:20:57,455 - INFO - autotuner.py:972 - flashinfer.jit: [Autotuner]: Autotuning process starts ...
+(EngineCore pid=1473664) INFO 09-19 12:20:57 [kernel_warmup.py:359] Running FlashInfer autotune with 8192 tokens and token buckets (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2560, 3072, 3584, 4096, 8192).
+(EngineCore pid=1473664) 2026-09-19 12:21:23,401 - INFO - autotuner.py:995 - flashinfer.jit: [Autotuner]: Autotuning process ends
+(EngineCore pid=1473664) 2026-09-19 12:21:23,422 - INFO - autotuner.py:2652 - flashinfer.jit: [Autotuner]: Saved 0 configs to /home/r0b0tdgx/.cache/vllm/flashinfer_autotune_cache/0.6.18.post1/121a/35871c38610508f852b28b0359439cf661198e9ee227ce6f5f478c60db9ba472/autotune_configs.json (0 new, 0 from previous config)
+(EngineCore pid=1473664) INFO 09-19 12:22:06 [gpu_worker.py:888] Free memory on device (108.73/121.69 GiB) on startup. Desired GPU memory utilization is (0.85, 103.44 GiB). Actual usage is 87.54 GiB for consumed memory (weights + non-torch), 5.5 GiB for peak activation, and 0.0 GiB for CUDAGraph memory. Replace gpu_memory_utilization config with `--kv-cache-memory=11001573479` (10.25 GiB) to fit into requested memory, or `--kv-cache-memory=16689740288` (15.54 GiB) to fully utilize gpu memory. Current kv cache memory in use is 10.39 GiB.
+(EngineCore pid=1473664) INFO 09-19 12:22:06 [jit_monitor.py:85] Kernel JIT monitor activated; monitored JIT compilations during inference will use mode=warn.
+(EngineCore pid=1473664) INFO 09-19 12:22:07 [torch_utils.py:287] Reducing Torch threads from 20 to 1 for serving. Set OMP_NUM_THREADS in the external environment to override.
+(EngineCore pid=1473664) INFO 09-19 12:22:07 [core.py:379] init engine (profile, create kv cache, warmup model) took 99.73 s
+(EngineCore pid=1473664) INFO 09-19 12:22:07 [kv_cache_utils.py:748] kv cache group sizes [4352, 4, 4352, 4352, 4352, 4352]
+(EngineCore pid=1473664) INFO 09-19 12:22:07 [kv_cache_utils.py:749] kv lcm block sizes 4352
+(EngineCore pid=1473664) INFO 09-19 12:22:08 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+INFO 09-19 12:22:15 [hf.py:642] Detected the chat template content format to be 'openai'. You can set `--chat-template-content-format` to override this.
+LOAD_OK
+Rendering prompts:   0%|          | 0/1 [00:00<?, ?it/s]Rendering prompts: 100%|██████████| 1/1 [00:00<00:00,  7.75it/s]Rendering prompts: 100%|██████████| 1/1 [00:00<00:00,  7.71it/s]
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s](EngineCore pid=1473664) WARNING 09-19 12:22:15 [jit_monitor.py:141] Triton kernel JIT compilation during inference: BuildPrefillChunkMetadataKernel.kernel. This causes a latency spike; consider extending warmup to cover this shape/config.
+Processed prompts: 100%|██████████| 1/1 [00:02<00:00,  2.29s/it, est. speed input: 2.62 toks/s, output: 6.99 toks/s]Processed prompts: 100%|██████████| 1/1 [00:02<00:00,  2.29s/it, est. speed input: 2.62 toks/s, output: 6.99 toks/s]Processed prompts: 100%|██████████| 1/1 [00:02<00:00,  2.29s/it, est. speed input: 2.62 toks/s, output: 6.99 toks/s]
+GEN_OK: ' πρωτο ελληνικο verse! Samaras是一个希腊语学习资料丰富的人'
+Rendering prompts:   0%|          | 0/1 [00:00<?, ?it/s]Rendering prompts: 100%|██████████| 1/1 [00:00<00:00, 247.35it/s]
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:03<00:00,  3.48s/it, est. speed input: 3.45 toks/s, output: 9.19 toks/s]Processed prompts: 100%|██████████| 1/1 [00:03<00:00,  3.48s/it, est. speed input: 3.45 toks/s, output: 9.19 toks/s]Processed prompts: 100%|██████████| 1/1 [00:03<00:00,  3.48s/it, est. speed input: 3.45 toks/s, output: 9.19 toks/s]
+GEN2: '  Write your answer with a <answer> tag wrapping your answer.  Your answer: 4. | Write your answer with the <answer> tag.'
+SMOKE_DONE
+INFO 09-19 12:22:21 [utils.py:632] [shutdown] Process manager: send sigterm to process EngineCore
+(EngineCore pid=1473664) INFO 09-19 12:22:21 [core.py:1342] [shutdown] EngineCore: trigger received signal=SIGTERM
+(EngineCore pid=1473664) INFO 09-19 12:22:21 [core.py:1493] [shutdown] EngineCore: start mode=abort timeout=0s
+(EngineCore pid=1473664) INFO 09-19 12:22:21 [core.py:1524] [shutdown] EngineCore: request processing complete; starting resource teardown
+(EngineCore pid=1473664) INFO 09-19 12:22:21 [core.py:1355] [shutdown] EngineCore: exiting busy loop
+WARNING 09-19 12:22:26 [utils.py:652] [shutdown] Process manager: force killing remaining processes count=1
+WARNING 09-19 12:22:26 [utils.py:657] [shutdown] Process manager: force killing remaining process EngineCore pid 1473664

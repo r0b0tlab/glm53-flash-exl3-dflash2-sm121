@@ -1,0 +1,21 @@
+Warning: You are about to upload a large folder to the Hub using `hf upload-large-folder`. This is a new feature so feedback is very welcome!
+
+A few things to keep in mind:
+  - Repository limits still apply: https://huggingface.co/docs/hub/repositories-recommendations
+  - Do not start several processes in parallel.
+  - You can interrupt and resume the process at any time. The script will pick up where it left off except for partially uploaded files that would have to be entirely reuploaded.
+  - Do not upload the same folder to several repositories. If you need to do so, you must delete the `./.cache/huggingface/` folder first.
+
+Some temporary metadata will be stored under `/home/r0b0tdgx/models/glm-5.3-flash/exl3-2.25hq-tapK3/.cache/huggingface`.
+  - You must not modify those files manually.
+  - You must not delete the `./.cache/huggingface/` folder while a process is running.
+  - You can delete the `./.cache/huggingface/` folder to reinitialize the upload state when process is not running. Files will have to be hashed and preuploaded again, except for already committed files.
+
+If the process output is too verbose, you can disable the progress bars with `--no-bars`. You can also entirely disable the status report with `--no-report`.
+
+For more details, run `hf upload-large-folder --help` or check the documentation at https://huggingface.co/docs/huggingface_hub/guides/upload#upload-a-large-folder.
+Repo created: https://huggingface.co/r0b0tlab/GLM-5.3-Flash-EXL3-2.25bpw-sm121
+Found 42 candidate files to upload
+Running validation checks on files to upload...
+Validation checks complete.
+Starting upload...

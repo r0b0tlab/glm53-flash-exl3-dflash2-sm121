@@ -1,0 +1,12 @@
+[curve-k5fix] canary finish=stop 45 tok in 1.3s
+[curve-k5fix] c1 rep0: 1500 tok in 46.5s = 32.29 tok/s
+[curve-k5fix] c1 rep1: 1614 tok in 51.5s = 31.34 tok/s
+[curve-k5fix] c1 rep2: 1499 tok in 48.4s = 31.00 tok/s
+[curve-k5fix] c1 rep3: 1917 tok in 58.7s = 32.67 tok/s
+[curve-k5fix] c1 rep4: 1481 tok in 48.5s = 30.56 tok/s
+[curve-k5fix] C1: 256 tok in 10.0s = 25.7 agg (25.69/stream) finish=['length']
+[curve-k5fix] C2: 512 tok in 13.7s = 37.3 agg (18.66/stream) finish=['length']
+[curve-k5fix] C4: 1024 tok in 26.7s = 38.4 agg (9.60/stream) finish=['length']
+[curve-k5fix] C8: 2048 tok in 54.2s = 37.8 agg (4.72/stream) finish=['length']
+[curve-k5fix] C16: 4096 tok in 108.0s = 37.9 agg (2.37/stream) finish=['length']
+[curve-k5fix] CURVE_DONE c1_median=31.34 C16=37.9

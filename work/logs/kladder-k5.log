@@ -1,0 +1,10 @@
+[k5] canary: '12' self-identical=True
+[k5] c1 rep0: 1718 tok in 55.5s = 30.94 tok/s (finish=stop)
+[k5] c1 rep1: 1523 tok in 48.8s = 31.20 tok/s (finish=stop)
+[k5] c1 rep2: 2039 tok in 62.0s = 32.88 tok/s (finish=stop)
+[k5] c1 rep3: 1524 tok in 51.1s = 29.80 tok/s (finish=stop)
+[k5] c1 rep4: 2048 tok in 68.1s = 30.09 tok/s (finish=length)
+[k5] C16 a: 4096 tok in 105.2s = 38.9 agg tok/s
+[k5] C16 b: 4096 tok in 103.8s = 39.4 agg tok/s
+[k5] acceptance: AL=None draft%=None
+[k5] KLADDER_DONE c1_median=30.94 c16_best=39.4
