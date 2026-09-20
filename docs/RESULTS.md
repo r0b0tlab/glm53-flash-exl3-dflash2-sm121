@@ -1,83 +1,99 @@
 # Results — GLM-5.3-Flash EXL3 + DFlash2 on a single GB10 (SM121)
 
-All rows: one NVIDIA GB10 (DGX Spark), TP=1, temp 0, thinking at the template's
-lightest setting (`reasoning_effort=low`), DFlash2 K=7, 32768 ctx.
-Measured 2026-09-20 with the M4 engine (see `runtime.lock.json` + patches
-0001-0012). Raw logs and JSONs under `work/logs/`.
+All rows: one NVIDIA GB10 (DGX Spark), TP=1, temp 0, thinking at the
+template's lightest setting (`reasoning_effort=low`), 32,768 ctx.
+Measured 2026-09-20 with this runtime (vLLM v0.30.0rc1 base + patches 0001-0012;
+see `runtime.lock.json`). Raw logs/JSONs under `work/logs/`.
 
-## Single-stream (median of 5, 2048-token cap)
+## Headline — DFlash2 K=5 (the published config)
 
-| prompt class | this engine (1× GB10) | MiaAI-Lab (2× GB10, EXL3 4bpw) | single-Spark recipe (1× GB10, EXL3 2.05bpw) |
+| single-stream (median of 5, 2048-token cap) | tok/s |
+|---|---:|
+| structured output (25-country JSON) | **50.2** |
+| code (Python class) | **43.4** |
+| open prose (200-word story) | **19.5** |
+
+Concurrency ladder (structured prompt, aggregate tok/s over the round):
+
+| lanes | 1 | 2 | 4 | 6 | 8 | 16 |
+|---|---:|---:|---:|---:|---:|---:|
+| agg tok/s | 46.8 | 61.7 | **66.5** | 65.9 | 66.6 | **67.1** |
+
+## vs the published EXL3 field (same model, DFlash2, K=7 there)
+
+| | this engine (1× GB10) | MiaAI-Lab (2× GB10, EXL3 4bpw) | single-Spark 2.05bpw recipe (1× GB10) |
 |---|---:|---:|---:|
-| structured output | **52.5 tok/s** | — (code 35–44) | 64 |
-| code | **43.5 tok/s** | 35–44 | — |
-| open prose | **18.6 tok/s** | ~18 | 25 |
+| code / structured, single-stream | 43.4 / 50.2 | 35–44 | 64 |
+| prose, single-stream | 19.5 | ~18 | 25 |
+| ladder ×1 | **46.8** | 35 | ~64 |
+| ladder ×2 | **61.7** | 50 | — |
+| ladder ×4 | 66.5 | 67 | 182* |
+| ladder ×8 | **66.6** | 8.5–29 | — |
+| ladder ×16 | **67.1** | 6.8 | — |
 
-## Concurrency ladder (structured prompt, aggregate tok/s by concurrent streams)
+\* active-stream convention (sum of live stream rates, not wall aggregate).
+Aggregate convention here = completion tokens ÷ wall clock for the round.
+The 2× GB10 lane collapses beyond ×4; this single-GB10 engine holds ~66–67
+from ×2 through ×16.
 
-| lanes | this engine (1× GB10) | MiaAI-Lab (2× GB10) | single-Spark recipe |
-|---|---:|---:|---:|
-| ×1 | 50.4 | 35 | ~64 |
-| ×2 | 50.8 | 50 | — |
-| ×4 | **51.4** | 67 | 182 (active-stream convention) |
-| ×8 | **50.8** | 8.5–29 | — |
-| ×16 | **49.8** | 6.8 | — |
+## K choice (both measured, same serve flags)
 
-This engine holds its single-stream rate across all 16 lanes; the published
-2× GB10 EXL3 lane collapses beyond ×4. (Aggregate convention: total completion
-tokens ÷ wall clock for the round, including scheduler gaps.)
+| | structured | code | prose | C1 | C16 |
+|---|---:|---:|---:|---:|---:|
+| **K=5 (published)** | 50.2 | 43.4 | 19.5 | 46.8 | **67.1** |
+| K=7 (trained block) | 52.5 | 43.5 | 18.6 | 50.4 | 49.8 |
 
-## Speculative decoding (DFlash2 K=7)
+K=7 is ~4 % ahead on structured single-stream; K=5 is ahead on prose, and the
+K=5 ladder scales (C16 +35 % over K=7). Ship K=5; K=7 is one flag away
+(`num_speculative_tokens`) for structured-only workloads.
 
-- Draft: `incoai/GLM-5.3-Flash-DFlash2` converted to an EXL3 3.00bpw pack.
-- Acceptance telemetry: prose AL 2.5–3.2 (position-0 acceptance 0.62–0.88,
-  capture verified correct); predictable/repetitive text AL 6.6–7.4
-  (draft acceptance 80–92%).
-- Greedy losslessness: in-session temp-0 is true greedy (seed matrix 42/7/123 ×2
-  = 6/6 byte-identical; same-serve repeats byte-stable); spec-vs-no-spec on an
-  11-prompt set = 6 byte-exact + 5 single-token near-tie flips (the documented
-  GB10 batch-shape nondeterminism class — both continuations fluent).
+## Speculative decoding
+
+- Draft: `incoai/GLM-5.3-Flash-DFlash2` converted to an EXL3 3.00bpw pack
+  (CC-BY-NC-ND source — not redistributed).
+- Acceptance telemetry: prose AL 2.5–3.2 (position-0 acceptance 0.62–0.88);
+  predictable/repetitive text AL 6.6–7.4 (draft acceptance 80–92 %).
+- Greedy losslessness: in-session temp-0 is true greedy (seed matrix
+  42/7/123 × 2 = 6/6 byte-identical; same-serve repeats byte-stable);
+  spec-vs-no-spec on an 11-prompt set = 6 byte-exact + 5 single-token
+  near-tie flips (the documented GB10 batch-shape nondeterminism class; both
+  continuations fluent).
 
 ## Engine work behind these numbers
 
-- Fused EXL3 MoE (`exl3_moe` + `exl3_moe_gather`, vendored exllamav3 v1.5.0
-  kernels): 2.2× per-layer over the per-expert loop; banded prefill launches;
-  capture-safe routing; post-load fused warmup.
+- Fused EXL3 MoE (`exl3_moe` / `exl3_moe_gather`, vendored exllamav3 v1.5.0
+  kernels): 2.2× per-layer over the per-expert loop; banded prefill; capture-safe
+  routing; post-load fused warmup; capture path above the fused row capacity
+  rebuilt readback-free (capturing beyond ~32 tokens previously failed the boot).
 - CUDA graphs FULL with lane-complete capture sizes (all (1+K)×lanes shapes to
-  16 lanes); the quant MoE's capture path beyond the fused row capacity was
-  rebuilt to stay readback-free (any capture > ~32 tokens previously failed the
-  boot with `cudaErrorStreamCaptureUnsupported`).
+  16 lanes).
 - DFlash2 port: target aux capture with the mHC contraction; drafter KV group;
   drafter context-KV reconstruction; quantized-drafter pack support.
-- Known bound (measured, documented in `docs/CONCURRENCY-FINDING.md`): the
-  vLLM v1 host step (~100 ms at C1 on this platform; a D2H completion costs
-  ~2 ms behind in-flight work) — which is why the ladder is flat, and why
-  single-stream throughput = tokens-per-step ÷ host-step. In-class evidence:
-  the same-served AR/spec runs and the sibling 2× GB10 numbers fit the same
-  formula.
+- Known bound (`docs/CONCURRENCY-FINDING.md`): the vLLM v1 host step on this
+  platform (~2 ms per D2H completion behind in-flight work) sets the floor;
+  kernels are not the limiter (tensor cores engaged, 11–13 % utilized,
+  memory/issue-bound at these shapes).
 
 ## Reproduce
 
 ```bash
-# one GB10, aarch64, CUDA 13; venv with this repo + work/vllm pinned
 vllm serve <glm-5.3-flash-exl3-pack> \
-  --quantization exl3 --trust-remote-code \
+  --quantization exl3 --trust_remote_code \
   --served-model-name glm53-flash-exl3-dflash2 \
   --gpu-memory-utilization 0.85 --max-model-len 32768 --max-num-seqs 16 \
-  --speculative-config '{"method":"dflash","model":"<dflash2-exl3-pack>","num_speculative_tokens":7}' \
-  --compilation-config '{"cudagraph_capture_sizes":[1,2,4,8,16,24,32,48,56,64,80,96,112,128]}' \
+  --speculative-config '{"method":"dflash","model":"<dflash2-exl3-pack>","num_speculative_tokens":5}' \
+  --compilation-config '{"cudagraph_capture_sizes":[1,2,4,8,16,24,36,48,60,72,84,96]}' \
   --reasoning-parser glm47 --no-async-scheduling --max-num-batched-tokens 2048
 ```
 
-Bench: `work/bench/bench_class.py <tag> low` (per-class medians + ladder),
-`work/bench/kladder_curve.py` (curve + acceptance), `work/bench/serve-k5-q200.sh`
-(the exact launch script).
+Bench: `work/bench/bench_class.py <tag> low`, `work/bench/kladder_curve.py`,
+launch script `work/bench/serve-k5-q200.sh`.
 
 ## Evidence
 
-- `work/logs/bench-class-k7.log` / `.json` — this table's rows (2026-09-20).
-- `work/logs/curve-*.log` — concurrency curves (prose class) across flag A/Bs.
-- `docs/M4-RECEIPT.md` — DFlash2 port + losslessness + acceptance.
-- `docs/CONCURRENCY-FINDING.md` — the host-step/D2H analysis with nsys/py-spy
-  evidence and the two fixed bugs.
-- `profiles/single-gb10-optimize.md` — the lever list with per-lever receipts.
+- `work/logs/bench-class-k5.{log,json}` (published config) and
+  `bench-class-k7.{log,json}` (K=7 variant).
+- `work/logs/curve-*.log` — concurrency curves + flag A/Bs.
+- `docs/M4-RECEIPT.md` — DFlash2 port, losslessness, acceptance.
+- `docs/CONCURRENCY-FINDING.md` — host-step/D2H analysis; the two fixed bugs.
+- `profiles/single-gb10-optimize.md` — lever list with per-lever receipts.

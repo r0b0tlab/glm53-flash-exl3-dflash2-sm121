@@ -6,27 +6,30 @@ ATS unified memory) — with DFlash2 speculative decoding. The full runtime:
 pinned vLLM base + an out-of-tree EXL3 quantization plugin + vendored EXL3
 CUDA kernels + anchored patches + measured receipts.
 
-## Headline (single GB10, TP=1, temp 0, DFlash2 K=7; 2026-09-20)
+## Headline (single GB10, TP=1, temp 0, DFlash2 K=5; 2026-09-20)
 
 | single-stream (median of 5, 2048 cap) | | concurrency (structured, agg tok/s) | |
 |---|---:|---|---:|
-| structured output | **52.5 tok/s** | ×1 | 50.4 |
-| code | **43.5 tok/s** | ×4 | **51.4** |
-| open prose | **18.6 tok/s** | ×16 | **49.8** |
+| structured output | **50.2 tok/s** | ×1 | 46.8 |
+| code | **43.4 tok/s** | ×4 | **66.5** |
+| open prose | **19.5 tok/s** | ×16 | **67.1** |
 
-Context vs the published field (same model, EXL3, DFlash2 K=7):
+Context vs the published field (same model, EXL3, DFlash2):
 
-| | this engine | MiaAI-Lab (2× GB10, 4bpw) | single-Spark recipe (2.05bpw) |
+| | this engine (1× GB10) | MiaAI-Lab (2× GB10, 4bpw) | single-Spark recipe (2.05bpw) |
 |---|---:|---:|---:|
-| code single-stream | **43.5** | 35–44 | — |
-| ladder ×4 | 51.4 | 67 | 182* |
-| ladder ×8 | **50.8** | 8.5–29 | — |
-| ladder ×16 | **49.8** | 6.8 | — |
+| code single-stream | **43.4** | 35–44 | — |
+| ladder ×1 | **46.8** | 35 | ~64 |
+| ladder ×4 | 66.5 | 67 | 182* |
+| ladder ×8 | **66.6** | 8.5–29 | — |
+| ladder ×16 | **67.1** | 6.8 | — |
 
-\* active-stream convention. Full table + methods: [`docs/RESULTS.md`](docs/RESULTS.md).
+\* active-stream convention. This single-GB10 engine beats the published
+2× GB10 row at ×1/×2/×8/×16 and matches it at ×4. Full tables, the K=5-vs-K=7
+choice and methods: [`docs/RESULTS.md`](docs/RESULTS.md).
 
-The engine holds its single-stream rate across all 16 lanes; the published
-2× GB10 lane collapses beyond ×4. Losslessness and acceptance: see
+The engine climbs from 46.8 to 67.1 aggregate across the lanes while the
+published 2× GB10 lane collapses beyond ×4. Losslessness and acceptance: see
 [`docs/M4-RECEIPT.md`](docs/M4-RECEIPT.md) (greedy-exact in-session; spec-vs-AR
 differences are single-token near-tie flips). The measured platform bound
 (vLLM v1 host step; ~2 ms per D2H completion) and the two bugs fixed on the way
@@ -57,8 +60,8 @@ vllm serve <glm-5.3-flash-exl3-pack> \
   --quantization exl3 --trust-remote-code \
   --served-model-name glm53-flash-exl3-dflash2 \
   --gpu-memory-utilization 0.85 --max-model-len 32768 --max-num-seqs 16 \
-  --speculative-config '{"method":"dflash","model":"<dflash2-exl3-pack>","num_speculative_tokens":7}' \
-  --compilation-config '{"cudagraph_capture_sizes":[1,2,4,8,16,24,32,48,56,64,80,96,112,128]}' \
+  --speculative-config '{"method":"dflash","model":"<dflash2-exl3-pack>","num_speculative_tokens":5}' \
+  --compilation-config '{"cudagraph_capture_sizes":[1,2,4,8,16,24,36,48,60,72,84,96]}' \
   --reasoning-parser glm47 --no-async-scheduling --max-num-batched-tokens 2048
 ```
 
