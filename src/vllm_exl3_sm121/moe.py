@@ -219,12 +219,29 @@ class Exl3MoEMethod(FusedMoEMethodBase):
         if not self._fused_disabled and x.is_cuda and topk_ids.numel() > 0:
             num_tokens, top_k = topk_ids.shape
             rows = 256 if self.mul1 else 128  # wide tiles need the mul1 codebook
-            if (top_k <= 32 and num_tokens * top_k <= rows
-                    and x.shape[-1] == self.hidden
+            if (top_k <= 32 and x.shape[-1] == self.hidden
                     and x.dtype in (torch.float16, torch.bfloat16)):
-                if self._ensure_fused(layer, x.device):
-                    return self._apply_fused(layer, x, topk_weights, topk_ids)
+                a = num_tokens * top_k
+                if a <= rows:
+                    if self._ensure_fused(layer, x.device):
+                        return self._apply_fused(layer, x, topk_weights, topk_ids)
+                elif (self.mul1
+                        and not torch.cuda.is_current_stream_capturing()
+                        and self._ensure_fused(layer, x.device)):
+                    # Prefill-sized batch, eager: banded launches cover every
+                    # expert whose count fits the row capacity. Experts above
+                    # it need the recon tier (not ported) -> the loop.
+                    counts = self._expert_counts(x, topk_ids)
+                    if counts and max(counts) <= rows:
+                        return self._apply_fused(layer, x, topk_weights,
+                                                 topk_ids, counts=counts)
         return self._apply_loop(layer, x, topk_weights, topk_ids)
+
+    def _expert_counts(self, x, topk_ids) -> list[int]:
+        flat = topk_ids.reshape(-1).to(torch.int64)
+        c = torch.zeros(self.num_experts, dtype=torch.int64, device=x.device)
+        c.scatter_add_(0, flat, torch.ones_like(flat))
+        return c.tolist()
 
     def _apply_loop(self, layer, x, topk_weights, topk_ids):
         """Per-expert fallback: one exl3_gemm set per routed expert."""
@@ -320,7 +337,7 @@ class Exl3MoEMethod(FusedMoEMethodBase):
             self._fused_disabled = True
             return False
 
-    def _apply_fused(self, layer, x, topk_weights, topk_ids):
+    def _apply_fused(self, layer, x, topk_weights, topk_ids, counts=None):
         ext = kernels.require()
         f = self._fused
         assert f is not None
@@ -350,15 +367,33 @@ class Exl3MoEMethod(FusedMoEMethodBase):
                               device=x.device)
         out = torch.zeros((num_tokens, self.hidden), dtype=torch.float32,
                           device=x.device)
-        ext.exl3_moe(
-            x16, out, expert_count, token_sorted, weight_sorted,
-            f["temp_g"], f["temp_u"], f["temp_ig"], f["temp_iu"],
-            0, self.k13, self.k13, self.k2,  # act silu; K gate/up/down
-            f["gate_t"], f["gate_suh"], f["gate_svh"],
-            f["up_t"], f["up_suh"], f["up_svh"],
-            f["down_t"], f["down_suh"], f["down_svh"],
-            self.mcg, self.mul1, self.mcg, self.mul1, self.mcg, self.mul1,
-            0.0, -1, scratch, tables[0], 1, f["rows"], 16)
+        rows = f["rows"]
+        if counts is None:
+            # All-fused fast path: capture-safe (no host readback), sizes the
+            # launch for every active expert at once.
+            launches = [(-1, 1, rows, 16)]
+        else:
+            # Banded launches by row tile (mul1 only): one launch per band.
+            t0 = sum(1 for c in counts if 0 < c <= 16)
+            t1 = sum(1 for c in counts if 16 < c <= 32)
+            t2 = sum(1 for c in counts if 32 < c <= rows)
+            launches = []
+            if t2:
+                launches.append((t2, 33, rows, 64))
+            if t1:
+                launches.append((t1, 17, 32, 32))
+            if t0:
+                launches.append((t0, 1, 16, 16))
+        for num_active, lo, hi, m_tile in launches:
+            ext.exl3_moe(
+                x16, out, expert_count, token_sorted, weight_sorted,
+                f["temp_g"], f["temp_u"], f["temp_ig"], f["temp_iu"],
+                0, self.k13, self.k13, self.k2,  # act silu; K gate/up/down
+                f["gate_t"], f["gate_suh"], f["gate_svh"],
+                f["up_t"], f["up_suh"], f["up_svh"],
+                f["down_t"], f["down_suh"], f["down_svh"],
+                self.mcg, self.mul1, self.mcg, self.mul1, self.mcg, self.mul1,
+                0.0, num_active, scratch, tables[0], lo, hi, m_tile)
         ext.exl3_moe_gather(
             out, scratch, flat_expert, inv_order,
             tables[1, :self.num_experts], tables[0, :self.num_experts],
