@@ -1,0 +1,20 @@
+diff --git a/vllm/model_executor/models/qwen3_dflash.py b/vllm/model_executor/models/qwen3_dflash.py
+index ce3884a10e..59a44417c4 100644
+--- a/vllm/model_executor/models/qwen3_dflash.py
++++ b/vllm/model_executor/models/qwen3_dflash.py
+@@ -469,7 +469,14 @@ class DFlashQwen3Model(nn.Module):
+         self._hidden_norm_weight = self.hidden_norm.weight.data
+ 
+         # KV projection weights: [num_layers * 2 * kv_size, hidden_size]
+-        kv_weights = [a.qkv_proj.weight[a.q_size :] for a in layers_attn]
++        kv_weights = []
++        for a in layers_attn:
++            qkv_w = getattr(a.qkv_proj, "weight", None)
++            if qkv_w is None:
++                # Quantized drafter (e.g. EXL3): the layer keeps no dense
++                # weight; rebuild it from the quant method's pack once.
++                qkv_w = a.qkv_proj.quant_method.dense_weight()
++            kv_weights.append(qkv_w[a.q_size :])
+         self._fused_kv_weight = torch.cat(kv_weights, dim=0)
+         if has_bias:
+             kv_biases = [a.qkv_proj.bias[a.q_size :] for a in layers_attn]
