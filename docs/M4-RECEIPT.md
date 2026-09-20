@@ -76,23 +76,41 @@ Losslessness evidence:
   the spec run's byte-for-byte. Same acceptance interval of the matrix run:
   AL **7.42**, per-position 0.917 ×7 (the drafter's ceiling on repeated text).
 
+## K sweep + concurrency smoke
+
+Same story and repetitive prompts, one run per K (single runs; stories diverge
+at near-ties between runs, so treat ±5-10% as noise):
+
+| K | story (256) | repetitive (256) | story vs AR | repetitive vs AR |
+|---|---|---|---|---|
+| — (AR) | 18.98 | 17.96 | 1.00x | 1.00x |
+| 4 | 22.50 | 40.22 | 1.19x | 2.24x |
+| **5** | **24.21** | **42.70** | **1.28x** | **2.38x** |
+| 7 | 17.29 | 50.16 | 0.91x | 2.79x |
+
+K=5 acceptance (prose-level intervals): AL 2.45-3.18, position-0 0.62-0.82.
+The K=7 tail positions accept at 10%/6%/1% on prose — mostly wasted verify+draft
+work; K=5 keeps ~85% of the repetitive gain while turning prose positive.
+
+Concurrency smoke (the sibling overlay's OOB trigger class): a C=4 batch
+(1 long + 3 short prompts, mixed prefill+decode) completed clean at K=4 (12.1 s)
+and K=5 (13.9 s), all four outputs sane, no selector/embed errors. Tool-heavy
+BFCL at C>=2 remains unexercised.
+
 ## Working config
 
 ```python
 speculative_config={"method": "dflash", "model": DRAFT_PACK,
-                    "num_speculative_tokens": 7}
+                    "num_speculative_tokens": 5}   # 7 = repetitive/code-heavy, 4 = prose-tight
 max_num_seqs=16            # mamba cache budget with the drafter's KV group
 cudagraph_capture_sizes=[1, 2, 4, 8, 16]
 ```
 
 ## Caveats / follow-ups
 
-- **Prose overhead.** AL 2.65 on open prose makes K=7 ~neutral-to-slightly
-  negative there (−9% here) while predictable/code-like text gains 2.8×.
-  K=4 is the untested knob for prose-heavy serving.
-- **C≥2.** The sibling overlay hit a selector-walk OOB class on mixed
-  prefill+decode (NaN rows → sentinel id → target embed assert). Our tree has
-  no walk kernel (torch `_score_edges`) but C≥2 has not been exercised here.
+- **Repetitive/code-heavy serving:** switch K to 7 (2.79x vs 2.38x).
+- **C>=2:** mixed-batch smoke passes (K=4/K=5); the sibling's selector-walk OOB
+  class was triggered by tool-call churn (BFCL) — untested here.
 - Multi-stream/1M/NIAH were not part of this gate.
 
 ## Evidence files
@@ -103,3 +121,5 @@ cudagraph_capture_sizes=[1, 2, 4, 8, 16]
 - `work/logs/m4-final-verify-nospec-20260920.json` — no-spec twin.
 - `work/logs/m4-dflash-artwin-20260920.log` — first A/B twin.
 - `work/logs/m4-final-verify-matrix-20260920.log` / `.json` — seed matrix (greedy proof).
+- `work/logs/m4-ksweep-k4-20260920.{log,json}` / `m4-ksweep-k5-20260920.{log,json}`
+  — K sweep + C=4 concurrency smoke per K.

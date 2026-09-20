@@ -21,32 +21,41 @@ llm = LLM(
     speculative_config={             # DFlash2 (M4). Drop for AR-only; then max_num_seqs=64.
         "method": "dflash",
         "model": "/home/r0b0tdgx/models/glm-5.3-flash-dflash2/exl3-3.00bpw",
-        "num_speculative_tokens": 7,
+        "num_speculative_tokens": 5,   # K sweep: 5 = balanced default; 7 = repetitive/code-heavy; 4 = prose-tight
     },
 )
 ```
 
 ## Measured (same pack, same box, greedy)
 
-| Workload | no spec | + DFlash2 K=7 | + n-gram spec |
+| Workload | no spec | DFlash2 K=5 | DFlash2 K=7 | n-gram |
+|---|---|---|---|---|
+| decode, repetitive filler (2k prompt, 256 new) | 17.96 tok/s | 42.70 tok/s (2.38x) | **50.16 tok/s (2.79x)** | 44.72 tok/s (2.49x) |
+| decode, diverse prose (story, 256 new) | 18.98 tok/s | **24.21 tok/s (1.28x)** | 17.29 tok/s (0.91x) | 11.04 tok/s (0.57x) |
+| prefill (3608-token prompt, TTFT incl.) | 410.8 tok/s | ~unchanged | ~unchanged | 410.4 tok/s |
+
+K sweep (same story + repetitive prompts, one run each; K=4: 22.50/40.22 =
+1.19x/2.24x; prose-set average within noise of K=5):
+
+| K | story | repetitive | acceptance (prose set) |
 |---|---|---|---|
-| decode, repetitive filler (2k prompt, 256 new) | 17.96 tok/s | **50.16 tok/s (2.79x)** | 44.72 tok/s (2.49x) |
-| decode, diverse prose (story, 256 new) | 18.98 tok/s | 17.29 tok/s (0.91x) | 11.04 tok/s (0.57x) |
-| prefill (3608-token prompt, TTFT incl.) | 410.8 tok/s | ~unchanged | 410.4 tok/s |
+| 4 | 22.50 | 40.22 | AL 2.69, pos 0.70/0.45/0.31/0.24 |
+| **5** | **24.21** | **42.70** | AL 2.45-3.18, pos-0 0.62-0.82 |
+| 7 | 17.29 | 50.16 | AL 2.65, pos 0.68/0.43/0.22/0.15/0.10/0.06/0.01 |
 
-DFlash2 acceptance telemetry (K=7): prose set **AL 2.65** (per-position
-0.679/0.432/0.222/0.148/0.099/0.062/0.012, draft acceptance 23.6%); predictable
-text **AL 6.60-7.42** (0.88-0.92 per position, 80-92%). Position-0 0.68+ =
-capture/alignment correct. Lossless in class: temp-0 is true greedy
-(seed matrix 6/6 identical, same-serve repeats byte-stable); spec-vs-no-spec
-11 outputs = 6 byte-exact + 5 single-token near-tie flips (the documented
-GB10 nondeterminism class, both continuations fluent). Receipt:
-`docs/M4-RECEIPT.md`, logs `work/logs/m4-*`.
+The extra draft positions at K=7 accept at 10%/6%/1% on prose — pay verify+draft
+cost for ~nothing; K=5 tightens the tail while keeping most of the repetitive
+gain. Lossless in class: in-session temp-0 true greedy (K=7 seed matrix 6/6
+identical; same-serve repeats byte-stable at K=7); spec-vs-no-spec 11 outputs =
+6 byte-exact + 5 single-token near-tie flips (the documented GB10 nondeterminism
+class, both continuations fluent — one K=4 near-tie landed in a repetition loop,
+same class). Receipt: `docs/M4-RECEIPT.md`, logs `work/logs/m4-*`.
+Concurrency smoke: C=4 mixed prefill+decode batch passes clean at K=4 and K=5
+(sane outputs, no OOB); tool-heavy BFCL at C>=2 still unexercised.
 
-**DFlash2 verdict:** default ON — it dominates n-gram everywhere (2.79x vs
-2.49x on repetitive, 0.91x vs 0.57x on prose) and helps code/repetitive text
-most. The ~9% prose overhead is workload-driven (AL 2.65); K=4 is the untested
-knob for prose-heavy serving.
+**DFlash2 verdict:** default ON at **K=5** — beats n-gram everywhere and is a
+win on both clean workloads (1.28x prose, 2.38x repetitive). K=7 for
+repetitive/code-heavy serving (2.79x), K=4 as the prose-tight alternative.
 
 Progression of the default profile: per-expert loop 7.67 -> fused MoE 15.13 ->
 + graphs 16.80 -> + banded prefill + capture 1..24: 17.95 tok/s decode,
@@ -72,7 +81,7 @@ Logs: `work/logs/profile-{single-gb10,ngram}-20260919.log`,
 | max_num_seqs=64 (AR) / 16 (DFlash2) | ON | hybrid mamba block budget incl. the drafter's KV group |
 | n-gram spec decode | CONDITIONAL | superseded by DFlash2 where available; still a cheap option without a drafter |
 | GEMV fast path (`EXL3_GEMV`) | DEFAULT | already active via the kernel's heuristic; forcing mode 2 at m=1 changed nothing on GB10 (memory-bound here — the kernel's own note) and shifted numerics, so the heuristic stays. Microbench: `work/logs/gemv_bench-20260919.py` |
-| DFlash2 spec decode (M4) | **ON (default)** | EXL3 3.00bpw drafter (`glm-5.3-flash-dflash2/exl3-3.00bpw`); patches 0009-0012; measured above. `max_num_seqs=16` with the drafter |
+| DFlash2 spec decode (M4) | **ON (default)** | EXL3 3.00bpw drafter (`glm-5.3-flash-dflash2/exl3-3.00bpw`); patches 0009-0012; K=5 balanced / K=7 repetitive / K=4 prose; `max_num_seqs=16` |
 | Recon tier (experts > 256 rows) | NOT PORTED | very long prefills fall back to the per-expert loop; banded path covers counts <= 256 |
 | int8 GEMV (M2b) | NOT PORTED | dense-linears compute path; batch-1 decode is weight-traffic bound so the win is small |
 | async scheduling | auto | SchedulerConfig default (None = on where supported) |
