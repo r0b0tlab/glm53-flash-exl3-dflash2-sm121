@@ -375,3 +375,5 @@ Running as unit: exl3-serve-144229.scope; invocation ID: 55ff9163c636453cb9d20ae
 (APIServer pid=2351402) INFO 09-20 15:33:09 [loggers.py:315] Engine 000: Avg prompt throughput: 2.6 tokens/s, Avg generation throughput: 0.3 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%
 (APIServer pid=2351402) INFO 09-20 15:33:09 [metrics.py:120] SpecDecoding metrics: Mean acceptance length: 3.00, Accepted throughput: 0.00 tokens/s, Drafted throughput: 0.00 tokens/s, Accepted: 2 tokens, Drafted: 5 tokens, Per-position acceptance rate: 1.000, 1.000, 0.000, 0.000, 0.000, Avg Draft acceptance rate: 40.0%
 (APIServer pid=2351402) INFO 09-20 15:33:19 [loggers.py:315] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.0%, Prefix cache hit rate: 0.0%
+(APIServer pid=2351402) INFO:     127.0.0.1:34808 - "GET /v1/models HTTP/1.1" 200 OK
+(APIServer pid=2351402) INFO:     127.0.0.1:34820 - "POST /v1/chat/completions HTTP/1.1" 200 OK
