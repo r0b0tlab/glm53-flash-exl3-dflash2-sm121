@@ -225,12 +225,22 @@ class Exl3MoEMethod(FusedMoEMethodBase):
                 if a <= rows:
                     if self._ensure_fused(layer, x.device):
                         return self._apply_fused(layer, x, topk_weights, topk_ids)
+                elif torch.cuda.is_current_stream_capturing():
+                    # Capture: no host readback is allowed (the banded path's
+                    # per-expert counts would need .tolist(), and the loop's
+                    # torch.unique is outright capture-unsupported). The
+                    # all-fused launch covers every active expert at <= rows;
+                    # at capture sizes (<= 96 tokens over 256 experts)
+                    # per-expert counts are a few rows each, so exact.
+                    if self._ensure_fused(layer, x.device):
+                        return self._apply_fused(layer, x, topk_weights, topk_ids)
                 elif (self.mul1
-                        and not torch.cuda.is_current_stream_capturing()
                         and self._ensure_fused(layer, x.device)):
                     # Prefill-sized batch, eager: banded launches cover every
-                    # expert whose count fits the row capacity. Experts above
-                    # it need the recon tier (not ported) -> the loop.
+                    # expert whose count fits the row capacity; beyond that
+                    # the per-expert loop is measurably faster than a chunked
+                    # fused path (A/B 2026-09-20: 58 vs 109 ms at 2048 tok),
+                    # so the loop stays the eager fallback.
                     counts = self._expert_counts(x, topk_ids)
                     if counts and max(counts) <= rows:
                         return self._apply_fused(layer, x, topk_weights,
