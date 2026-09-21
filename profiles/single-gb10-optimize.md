@@ -57,6 +57,11 @@ Concurrency smoke: C=4 mixed prefill+decode batch passes clean at K=4 and K=5
 win on both clean workloads (1.28x prose, 2.38x repetitive). K=7 for
 repetitive/code-heavy serving (2.79x), K=4 as the prose-tight alternative.
 
+**Serve variant — tool lanes:** the base profile above is unchanged; tool-serving
+lanes (BFCL) additionally pass `--enable-auto-tool-choice --tool-call-parser glm47`
+alongside the existing `--reasoning-parser glm47`. The perf/quality lanes run
+without them, so the published numbers carry no tool-path surface.
+
 Progression of the default profile: per-expert loop 7.67 -> fused MoE 15.13 ->
 + graphs 16.80 -> + banded prefill + capture 1..24: 17.95 tok/s decode,
 410 tok/s prefill.
@@ -89,7 +94,9 @@ Logs: `work/logs/profile-{single-gb10,ngram}-20260919.log`,
 
 ## Explicit non-claims
 
-No quality campaign has run on this engine (Q200v2 / NIAH / BFCL pending).
-These are single-stream, greedy, 4k-context numbers on one GB10; they are not
-a serving-under-load claim and not a comparison against the NVFP4 or 3090
-lanes. The DFlash2 path has not been exercised at C>=2 (mixed prefill+decode).
+Quality/systems lanes have since been run separately on this profile:
+Q200v2 text-180 SCORED 170/180 (94.4 %), BFCL hard-20 10/20, SM12X systems
+complete/publishable (NIAH 5/5 at 32K) — see `docs/RESULTS.md`. The rows here
+are single-stream, greedy, 4k-context numbers on one GB10; they are not a
+serving-under-load claim. The DFlash2 path has not been exercised at C>=2
+(mixed prefill+decode) for tool-call loads.

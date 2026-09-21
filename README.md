@@ -56,10 +56,19 @@ vllm serve <glm-5.3-flash-exl3-pack> \
 Benchmarks: `work/bench/bench_class.py` (per-class medians + concurrency
 ladder), `work/bench/kladder_curve.py` (curve + acceptance telemetry).
 
+## Standard lanes (2026-09-21)
+
+- Q200v2 text-180: **SCORED 170/180 = 94.4 %** (independent manual review on the
+  manual-grade family; transport complete).
+- BFCL v4 multi_turn_base structural-hard20: **10/20** (structured tool-call lane;
+  decode-failure integration finding documented in `docs/RESULTS.md`).
+- SM12X-LLM-BENCH systems: **complete / publishable** — NIAH 5/5 at the
+  advertised 32768 window (incl. multi-key 33/66), concurrency and throughput
+  rows, 832-sample telemetry. Full tables in `docs/RESULTS.md`.
+
 ## Status / limits
 
-- Single GB10, TP=1. Quality campaign (Q200v2 / BFCL hard-20) staged but not
-  run; C≥2 tool-call loads not exercised; TP=2 parked.
+- Single GB10, TP=1. C≥2 tool-call loads not exercised; TP=2 parked.
 - Vision: verified (image Q&A smoke on the published config — see
   `docs/RESULTS.md`; image requests are drafted text-only).
 - The concurrency ceiling is the vLLM v1 host step on this platform (measured;

@@ -1,0 +1,13 @@
+== inspect ==
+inspect ok
+== run ==
+BFCL_RUN_RC=1
+== evaluate ==
+BFCL_EVAL_RC=1
+== status ==
+{
+  "rows": 20,
+  "selected_present": 20,
+  "missing": [],
+  "freshness_witness": true
+}

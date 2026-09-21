@@ -1,0 +1,26 @@
+canary 0/1
+bfcl_mt 0/200
+bfcl_ast 0/600
+latency 0/5
+latency 0/5
+latency 1/5
+latency 1/5
+latency 5/5
+concurrency 0/4
+concurrency 0/4
+concurrency 1/4
+concurrency 1/4
+concurrency 4/4
+throughput 0/8
+throughput 0/8
+throughput 1/8
+throughput 1/8
+throughput 8/8
+niah 0/5
+niah 0/5
+niah 1/5
+niah 1/5
+niah 5/5
+mtp 0/1
+mtp 0/1
+/home/r0b0tdgx/vllm-exl3-sm121/work/bench/sm12x-systems/20260920T235059Z/report.json

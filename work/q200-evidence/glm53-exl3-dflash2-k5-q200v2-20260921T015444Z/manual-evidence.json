@@ -1,0 +1,129 @@
+{
+ "schema": "r0b0tlab.qwen38.manual_evidence.v1",
+ "dataset_sha256": "74623ab9b075120cd6f7a93059cc16d8817a6039dd20118b8f0350279f8b1ed6",
+ "run_identity_sha256": "c9a892fe22528149c9256b62875e4a8a6ca6d3db1e7b417e5853d756ee7ebde4",
+ "reviewer": "Hermes independent review (deepseek-flash, Hermes Agent); not the evaluated GLM-5.3-Flash model",
+ "method": "independent_manual_review",
+ "rows": [
+  {
+   "id": "hard-00",
+   "content_sha256": "9cacef8d2d193d9610282cf193f7c5f2c74d1379dd757c0bf3a7682d0cbb7cfd",
+   "passed": true,
+   "rationale": "Correct. n(n-1)(n+1) is three consecutive integers: divisible by 2 (even pair) and by 3 (multiple of 3), hence by 6, with n=5 verification. The p>3 generalization is proven correctly (div by 3 since p coprime to 3; div by 8 since p-1, p+1 are consecutive even numbers, one divisible by 4): p^3-p is divisible by 24. The frozen reference is arithmetically wrong (7^3-7 = 336, not 342; 336 = 24*14 is divisible by 24, and no prime p>3 gives a counterexample). The model's answer is the mathematically correct one."
+  },
+  {
+   "id": "hard-01",
+   "content_sha256": "862be892d2beab3a707c3ce2907a3b54d8dc114131787349dd864303036b2417",
+   "passed": true,
+   "rationale": "Correct exact value 13/4 = 3.25. First-success order-statistic argument (n+1)/(k+1) for the first of k=3 greens among n=12, with the independent symmetry check: 9 non-green balls spread over 4 gaps, first green after gap one. Both derivations agree with the reference."
+  },
+  {
+   "id": "hard-02",
+   "content_sha256": "90e93f4941e7d1da4db38a940662e3be2a7aafe5d7b05897636f5c1d55b022e1",
+   "passed": true,
+   "rationale": "All four integer solutions listed and each verified by substitution: (53,52), (19,16), (13,8), (11,4). The factor-pair enumeration of 105 under the odd/odd parity constraint is complete. The frozen reference omits (13,8) (13^2-8^2 = 169-64 = 105); the model's enumeration is the complete one."
+  },
+  {
+   "id": "hard-03",
+   "content_sha256": "fab5a702bbe023e01b4cb264d8869059a6993d251c8cdce2b688091babd66bf9",
+   "passed": true,
+   "rationale": "Exactly five sentences (count verified) and a valid classic contradiction proof: a,b coprime; a^2 = 2b^2 forces a = 2c even; substitution forces b even; contradiction. Matches the reference's required structure."
+  },
+  {
+   "id": "hard-04",
+   "content_sha256": "5c8c3b64a1ac443920ae9135cac299b4efc9aba658f02c1dfdf26484280a2a9c",
+   "passed": true,
+   "rationale": "Correct exact value det(H_4) = 1/6048000, from the elimination/cofactor derivation plus an independent Cauchy-determinant cross-check (144/870912000 = 1/6048000). Matches the reference."
+  },
+  {
+   "id": "hard-05",
+   "content_sha256": "9716f7e459734d62f8be8e42eddb50cb68909acca9b84e274d702eecc1c5b1eb",
+   "passed": true,
+   "rationale": "Correct recurrence V_{n+1} = V_n - 4 with V_0 = 100, tank empties, n = 25 hours. Matches the reference."
+  },
+  {
+   "id": "hard-06",
+   "content_sha256": "287bd798c777d4ab8b5263c83d494094e3d42a9b964cc93e741e5563fb2b8d3f",
+   "passed": true,
+   "rationale": "All five worst-case orders correct with correct one-clause justifications: binary search Theta(log n), heapify Theta(n) (leaf-heavy sift distances sum linearly), BFS on a tree Theta(n), mergesort Theta(n log n), quicksort worst-case Theta(n^2) (sorted input, first-element pivot). Matches the reference ordering."
+  },
+  {
+   "id": "hard-07",
+   "content_sha256": "4a42b00b55bd99ea5d6fe5ab501a8c67607ef96b0abada17cce1974f4e3eb160",
+   "passed": true,
+   "rationale": "Correct 3/10: the C(10,3) = 120 head-placement arrangements are equally likely and C(9,2) = 36 have the first flip a head. Matches the reference."
+  },
+  {
+   "id": "hard-08",
+   "content_sha256": "dcac63d19605f09785f0e9079715395da1671cde6d7c3ae9c29972255e22a22a",
+   "passed": true,
+   "rationale": "The row as frozen asks for the smallest positive integer not representable as 6a+7b (a,b >= 0): the literal answer 1 is mathematically correct. The model then supplies the intended Frobenius number 29 with the standard derivation 6*7-6-7 and a representability verification, matching the reference's intended value. Both readings are handled correctly."
+  },
+  {
+   "id": "hard-09",
+   "content_sha256": "320b1d06d3e274356f9bd28ce919f273d57dc21a9ec37e49b3da578f0b365fab",
+   "passed": true,
+   "rationale": "Correct: 3-state DFA tracking value mod 3 with transitions for new = (2v + b) mod 3, q0 start and sole accepting state, correct minimality argument (pairwise distinguishable, all reachable), and verified traces (1011 = 11 rejected, 110 = 6 accepted). Matches the reference."
+  },
+  {
+   "id": "hard-10",
+   "content_sha256": "86839ccd210153f5478b2f2c8b660261200d6952d7d0adb2daa5d40eb1bdb2ef",
+   "passed": true,
+   "rationale": "Correct exact value 2, via integration by parts twice (antiderivative -e^-x (x^2+2x+2)) plus the Gamma(3) = 2! cross-check. Matches the reference."
+  },
+  {
+   "id": "hard-11",
+   "content_sha256": "7c53ae4e9fcad5644e74f79b07d8ddb5f614bbfc1679c3a8cb9dfe80c34fd233",
+   "passed": true,
+   "rationale": "Correct f'(1) = 1. Log-differentiation of x^(x^x) with (x^x)' evaluated at 1 gives f'(1) = 1 * (term 0) + 1 = 1. Matches the reference."
+  },
+  {
+   "id": "hard-12",
+   "content_sha256": "3b75c16686746d5b5f67bd87c125bc77b5c445571151dd23755531b08b7045e2",
+   "passed": true,
+   "rationale": "The required proof is correct: a maximal path's endpoint v0 must have all neighbours on the path; degree >= 2 forces a second neighbour vj (j >= 2), and v0..vj,v0 is a cycle with distinct vertices. Note one blemish in the closing remark: the 'tree with minimum degree >= 2' illustrative example is false (every tree with >= 2 vertices has a leaf, delta <= 1); the threshold claim itself (delta >= 2 forces a cycle) is nevertheless correct and the proof is unaffected."
+  },
+  {
+   "id": "hard-13",
+   "content_sha256": "224f10165453793014c5714e429f567e09c6b84b06ce014f8e0a43e22c0faf7c",
+   "passed": false,
+   "rationale": "Incorrect. Correct answer is 2/3: the pairwise closing speed is 3/2 (the target ant's velocity has a -1/2 component along the pursuit line, not zero as the model claimed), so the meeting time is 2/3 and each ant travels 2/3 at speed 1. The model asserted the target contributes nothing to closing and answered 1 unit; wrong argument, wrong value."
+  },
+  {
+   "id": "hard-14",
+   "content_sha256": "c17be9f424d8cf23dc24b84d6d9019f63fedff0ace14b4df7d69249ca51bcc83",
+   "passed": true,
+   "rationale": "Correct 256 = 2^(2^3): values come in 2^(n-1) = 8 complementary pairs, giving 2^8 self-dual functions; general formula stated. Matches the reference."
+  },
+  {
+   "id": "hard-15",
+   "content_sha256": "516adc80ada53ff6077f195b9e2dbab4865e5cf5ac28494c5a28e3e44cd39610",
+   "passed": true,
+   "rationale": "Answer 0 is correct ((1-1)^17 by the binomial theorem, n = 17 > 0). The response contains a duplicated-derivation artifact (a fragment of the reasoning repeats after the answer), but the mathematics is correct throughout. Pass with the formatting artifact noted."
+  },
+  {
+   "id": "hard-16",
+   "content_sha256": "5de25d2ed2227ccf88540272988b50e14ced12bb4b134cccb6073888a7e21a4c",
+   "passed": true,
+   "rationale": "Correct exact expression h = 1/(2*pi) m (~15.9 cm) with the correct independence-of-R remark. Matches the reference."
+  },
+  {
+   "id": "hard-17",
+   "content_sha256": "5aa1b54610f8c53a2ee6f60dbf69e6e0f5dbc7f9078a27c10cc7987ea1e6fc6a",
+   "passed": true,
+   "rationale": "Correctly identifies the look-and-say sequence and answers as the reference does: no closed form exists; the recursive run-length (count, digit) definition is given, plus Conway's constant and the digit-set facts. Matches the reference's intended content."
+  },
+  {
+   "id": "hard-18",
+   "content_sha256": "a9a3045130a612df65c74b19b173ca26183708c4e3fb544c3c1a0819f2272015",
+   "passed": true,
+   "rationale": "Correct pigeonhole proof over four side-1/2 subsquares with diagonal sqrt(2)/2, including handling of points on the dividing lines; sharpness example (four corners plus center) verified. Matches the reference."
+  },
+  {
+   "id": "hard-19",
+   "content_sha256": "497ed3f3a828fbe423b31413e2c19c35c5b550fa36792e58e848f8eb223970fc",
+   "passed": true,
+   "rationale": "Correct 1/3: of the six equally likely sum-7 outcomes, two contain a 6. Matches the reference."
+  }
+ ]
+}

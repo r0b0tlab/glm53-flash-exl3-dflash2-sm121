@@ -1,0 +1,15 @@
+SM12X_RC=0
+{
+ "run_status": "complete",
+ "invalid_for_publish": false,
+ "profile": "systems",
+ "model": "glm53-flash-exl3-dflash2"
+}
+  canary       PASS       {'http_status': 200, 'text_preview': '4', 'ok': True}
+  bfcl_mt      PROTOCOL   {'error': 'set SM12X_BFCL_PYTHON to official bfcl-eval interpreter', 'protocol': True}
+  bfcl_ast     PROTOCOL   {'error': 'set SM12X_BFCL_PYTHON to official bfcl-eval interpreter', 'protocol': True}
+  latency      PASS       {'n': 5, 'drop_first': True, 'ttft_ms_p50': 282.26366500894073, 'itl_ms_p50': 30.739843982326633, 'e2e_tok_s_p50': 31.53
+  concurrency  PASS       {'n': 4, 'cells': [{'concurrency': 1, 'ok': True, 'e2e_tok_s_p50': 31.09404696291102, 'infra': 0}, {'concurrency': 2, 'o
+  throughput   PASS       {'n': 8, 'decode_tok_s_p50': 24.037113918111174, 'prefill_tok_s_p50': 346.0784412535473, 'decode_rows': [{'ok': True, 'e
+  niah         PASS       {'window': 32768, 'reserve': 512, 'single_depths': [8064, 16128, 29030], 'multi_depths': [10644, 21288], 'depths': [8064
+  mtp          PASS       {'n': 1, 'accept_len': None, 'has_metrics': True, 'probe_ok': True, 'probe_completion_tokens': 128}

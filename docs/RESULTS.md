@@ -58,6 +58,39 @@ Reproduce: `work/bench/vision_probe.py`; evidence
 `work/logs/vision-probe-20260920.log`. Vision was NOT part of the timing
 ladder; the perf rows are text-only.
 
+## Standard publication package (2026-09-21, all lanes on the published profile)
+
+Q200v2 quality lanes (kit `work/q200-runner`, kit-default thinking =
+`{"enable_thinking":true,"thinking":true,"reasoning_effort":"low"}`,
+16384 budget):
+
+| lane | result |
+|---|---|
+| text-180 (frozen `quality-text-180-v2`, sha `74623ab9…`) | **SCORED 170/180 = 94.4 %** — gsm8k 97.5 %, humaneval 100 %, hard_reasoning 95 % (independent manual review, 19/20), ifeval 82.5 %; all 180 rows `stop`; transport complete, 0 ungraded |
+| BFCL v4 multi_turn_base structural-hard20 | **SCORED 10/20 = 50 %** (transport complete; ~115 turn-step responses not decodable as tool calls at default thinking — integration finding, documented) |
+
+Q200 text-180 throughput (same run, 4-worker lane): 39,743 completion tokens
+in ~18.8 min wall ≈ 35 tok/s aggregate; per-stream p50 15.3 tok/s ≈ the
+measured C4 regime for this prompt class.
+
+SM12X-LLM-BENCH systems lane (report `work/bench/sm12x-systems/`):
+`run_status: complete`, `invalid_for_publish: false`.
+
+| lane | result |
+|---|---|
+| canary | PASS |
+| latency (256-out) | TTFT p50 282 ms, ITL p50 30.7 ms, e2e 31.5 tok/s |
+| concurrency (per-stream p50) | 31.1 / 23.3 / 16.3 / 8.5 tok/s at C1/2/4/8 — aggregate 31.1 / 46.6 / 65.2 / 68.0 |
+| throughput | decode 24.0 tok/s p50 (2048-out ×5); prefill 346 tok/s (~14k prompt) |
+| niah | 5/5 found at the advertised 32768 window — single 8064 / 16128 / 29030 + multi-key 10644 / 21288 |
+| bfcl lanes | PROTOCOL (env not set — quality carried by the Q200v2 kit instead) |
+| mtp | probe ok (n/a for DFlash2) |
+| telemetry | 832 samples: GPU util p50 96 %, SM clock p50 2463 MHz, temp p50 81 °C, power p50 68.8 W |
+
+Convention note: the systems lanes ran at template-default thinking (max);
+the class bench and the Q200v2 lanes at `effort=low` (kit default). Tool
+lanes add `--enable-auto-tool-choice --tool-call-parser glm47` to the serve.
+
 ## Engine work behind these numbers
 
 - Fused EXL3 MoE (`exl3_moe` / `exl3_moe_gather`, vendored exllamav3 v1.5.0

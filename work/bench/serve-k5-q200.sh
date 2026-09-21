@@ -23,6 +23,8 @@ systemd-run --user --scope -p MemoryMax=112G -p MemorySwapMax=6G \
     --speculative-config "{\"method\":\"dflash\",\"model\":\"/home/r0b0tdgx/models/glm-5.3-flash-dflash2/exl3-3.00bpw\",\"num_speculative_tokens\":$EXL3_K}" \
     --compilation-config '{"cudagraph_capture_sizes":[1,2,4,8,16,24,32,48,56,64,80,96,112,128]}' \
     --reasoning-parser glm47 \
+    --enable-auto-tool-choice \
+    --tool-call-parser glm47 \
     --no-async-scheduling \
     --max-num-batched-tokens 2048 \
     --host 127.0.0.1 --port 8000 \

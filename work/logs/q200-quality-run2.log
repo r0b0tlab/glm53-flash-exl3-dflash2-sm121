@@ -1,0 +1,6 @@
+QUALITY_RC=2
+drwxrwxr-x 2 r0b0tdgx r0b0tdgx   4096 Sep 20 20:52 .
+drwxrwxr-x 4 r0b0tdgx r0b0tdgx   4096 Sep 20 19:11 ..
+-rw-rw-r-- 1 r0b0tdgx r0b0tdgx 561729 Sep 20 20:52 glm53-exl3-dflash2-k5-q200v2-20260921T001124Z.rows.jsonl
+-rw-rw-r-- 1 r0b0tdgx r0b0tdgx   4060 Sep 20 20:52 glm53-exl3-dflash2-k5-q200v2-20260921T001124Z.summary.json
+-rw-rw-r-- 1 r0b0tdgx r0b0tdgx   4060 Sep 20 20:52 quality-run.log

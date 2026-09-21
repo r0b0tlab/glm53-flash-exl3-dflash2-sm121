@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/r0b0tdgx/vllm-exl3-sm121/work/q200-runner/scripts/run_bfcl_hard20.py", line 764, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/r0b0tdgx/vllm-exl3-sm121/work/q200-runner/scripts/run_bfcl_hard20.py", line 753, in main
+    raise RuntimeError("evaluate mode requires no pre-existing score artifact")
+RuntimeError: evaluate mode requires no pre-existing score artifact

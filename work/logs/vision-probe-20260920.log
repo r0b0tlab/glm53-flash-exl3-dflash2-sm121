@@ -1,0 +1,3 @@
+probe1 finish=stop: 'The image contains the word **BANANA** and the number **42**.'
+probe2 finish=stop: 'There are **3 circles** in the image:\n\n1. **Blue** circle (left)\n2. **Green** circle (middle)\n3. **Orange** circle (right)\n\nThe text at the bottom reads: **HELLO WORLD**'
+VISION_PROBE_DONE

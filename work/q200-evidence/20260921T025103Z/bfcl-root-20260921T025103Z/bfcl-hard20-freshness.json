@@ -1,0 +1,24 @@
+{
+  "generation_complete": true,
+  "generation_completed_utc": "2026-09-21T03:35:55Z",
+  "ignored_preflight_lock_files": [
+    ".file_locks/33615f5082b8a54a931662278ae1b6cf4f251766.lock",
+    ".file_locks/36cc09e822db7c65dba82c98ee9cd928e858c99c.lock",
+    ".file_locks/564f760d6cca03894371f8e2e9a00ae9c9dcb08a.lock",
+    ".file_locks/62c0a6185765320458368dd09d8a88e5ae294d3e.lock",
+    ".file_locks/73e7650e4fdb65e70e3dda26c2955817c1d3aba3.lock",
+    ".file_locks/910ed4400d8135d25af51a23d8a42edc713d23e2.lock",
+    ".file_locks/a30b2c2d730fab9140b14fd50465a0b6b6529f40.lock",
+    ".file_locks/bbdf9131baed9a77a1b0af396dd87a65a7479deb.lock",
+    ".file_locks/c285ef1bc51bf3d658421f1d6e6e8ccf4cfbf08a.lock"
+  ],
+  "mode": "run",
+  "preexisting_files": [],
+  "preexisting_timing": false,
+  "project_root": "/home/r0b0tdgx/vllm-exl3-sm121/work/q200-evidence/20260921T025103Z/bfcl-root-20260921T025103Z",
+  "result_sha256": "5f5cdd71870d4f4b513cdbcb130aa2374e6531da689539c14ca2649fac9b2296",
+  "runtime_binding_sha256": "b672c23b78046439715447a2e52cb966c07b1908f88a6533db486dde09a41659",
+  "schema": "r0b0tlab.qwen38.bfcl_freshness.v1",
+  "started_utc": "2026-09-21T02:51:08Z",
+  "timing_sha256": "037a42519af5f950311f83a515ac35927adc3a27c9411376ee9d80bc660499a2"
+}
