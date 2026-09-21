@@ -16,8 +16,7 @@ python3 scripts/run_quality_set.py \
   --image-id sha256:9ab175696a136534026ebcc7f94d7f3ab5b4bb1970706424054788a85ad26eb0 \
   --profile-id glm53exl3-dflash2-k5-serve32768 \
   --candidate-id glm53-flash-exl3-2.25hq-tapK3-dflash2k5 \
-  --chat-template-kwargs '{"reasoning_effort": "max"}' \
-  --workers 4 --max-tokens 8192 --timeout 1800 \
+  --workers 4 --max-tokens 16384 --timeout 1800 \
   > "$EV/quality-run.log" 2>&1
 rc=$?
 echo "QUALITY_RC=$rc"

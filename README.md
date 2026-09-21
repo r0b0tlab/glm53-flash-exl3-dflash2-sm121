@@ -1,4 +1,4 @@
-# vllm-exl3-sm121
+# glm53-flash-exl3-dflash2-sm121
 
 r0b0tlab's vLLM build for serving **EXL3 (ExLlamaV3 trellis) quants of
 GLM-5.3-Flash** on **one NVIDIA GB10 / DGX Spark** (SM121, aarch64, CUDA 13,

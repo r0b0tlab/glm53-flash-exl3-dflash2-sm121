@@ -14,7 +14,7 @@ nvcc --version | tail -1                   # CUDA 13.x
 ## 2. Bootstrap (one node first)
 
 ```bash
-git clone <this repo> && cd vllm-exl3-sm121
+git clone <this repo> && cd glm53-flash-exl3-dflash2-sm121
 bash scripts/bootstrap_cluster.sh --check   # dry run: verify pins and tools
 bash scripts/bootstrap_cluster.sh           # clone pinned vLLM, install plugin, build ext
 ```

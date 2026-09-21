@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# GB10 cluster bootstrap for vllm-exl3-sm121.
+# GB10 cluster bootstrap for glm53-flash-exl3-dflash2-sm121.
 # Usage:
 #   scripts/bootstrap_cluster.sh --check   # platform + pin check only
 #   scripts/bootstrap_cluster.sh           # full bootstrap (long first build)
