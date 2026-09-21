@@ -1,4 +1,4 @@
-# M3 receipt — first full EXL3 load + generation on vLLM / SM121 (2026-09-19)
+# M3 receipt — first full EXL3 load + generation in this fork (vLLM / SM121, 2026-09-19)
 
 **Status: ENGINE FUNCTIONAL.** The GLM-5.3-Flash EXL3 pack (`2.25hq-tapK3`,
 91.67 GiB / 31 shards) loads through the `vllm_exl3_sm121` plugin on one GB10
