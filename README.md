@@ -75,4 +75,4 @@ ladder), `work/bench/kladder_curve.py` (curve + acceptance telemetry).
 
 ## License
 
-Our code: Apache-2.0 (`LICENSE`). Vendored exllamav3 sources: MIT (`vendored/exllamav3/LICENSE`).
+Our code: MIT (`LICENSE`). Vendored exllamav3 sources: MIT (`vendored/exllamav3/LICENSE`).

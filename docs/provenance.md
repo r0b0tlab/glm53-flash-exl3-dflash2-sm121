@@ -3,7 +3,7 @@
 Per-file record of where code in this repository comes from. Update in the
 same commit as any change.
 
-## Our code (Apache-2.0)
+## Our code (MIT)
 
 Everything under `src/`, `tests/`, `scripts/`, `docker/`, `csrc/`,
 `patches/`, `docs/` unless listed below.
