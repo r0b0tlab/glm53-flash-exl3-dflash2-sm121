@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Class-convention perf bench: structured / code / prose x C1 median(5) + ladder.
 
-Mirrors the published EXL3/DFlash2 lanes (MiaAI: code 35-44 solo, prose ~18;
-single-Spark: structured 64, prose 25, C4 agg 182) so numbers are comparable.
+Mirrors the class-convention perf bench: structured / code / prose at C1
+(median of 5) plus the concurrency ladder, so numbers line up across runs.
 Tag: bench-class-<label>.  chat kwargs: reasoning_effort=low (lightest this
 template has; the class rows are think-off).
 """

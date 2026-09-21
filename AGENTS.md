@@ -6,7 +6,7 @@ These rules are non-negotiable for humans and agents alike.
 
 2. The target platform is GB10 / DGX Spark: aarch64, SM121, CUDA 13, ATS unified memory (~121.7 GiB usable). Anything that assumes x86, discrete VRAM, or sub-128 thread-block semantics must be flagged.
 
-3. License firewall. Publishable code in this repository descends only from: vLLM (Apache-2.0), turboderp-org/exllamav3 (MIT), and any file recorded in `docs/provenance.md`. AGPL code (vllm-exl3, Aphrodite/sonar, current MiaAI repositories, community recipe repos) may be read and run privately for comparison, but must never be copied, vendored, or adapted into this repository. New files that adapt third-party MIT code must be added to `docs/provenance.md` in the same commit.
+3. License firewall. Publishable code in this repository descends only from: vLLM (Apache-2.0), turboderp-org/exllamav3 (MIT), and any file recorded in `docs/provenance.md`. AGPL-licensed third-party engines and community recipe repositories may be read and run privately for comparison, but must never be copied, vendored, or adapted into this repository. New files that adapt third-party MIT code must be added to `docs/provenance.md` in the same commit.
 
 4. Patches under `patches/vllm/` must be anchored (exact context lines) and fail closed if an anchor does not match. Never write a patch that silently skips.
 

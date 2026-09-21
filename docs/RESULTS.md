@@ -19,33 +19,7 @@ Concurrency ladder (structured prompt, aggregate tok/s over the round):
 |---|---:|---:|---:|---:|---:|---:|
 | agg tok/s | 46.8 | 61.7 | **66.5** | 65.9 | 66.6 | **67.1** |
 
-## vs the published EXL3 field (same model, DFlash2, K=7 there)
-
-| | this engine (1× GB10) | MiaAI-Lab (2× GB10, EXL3 4bpw) | single-Spark 2.05bpw recipe (1× GB10) |
-|---|---:|---:|---:|
-| code / structured, single-stream | 43.4 / 50.2 | 35–44 | 64 |
-| prose, single-stream | 19.5 | ~18 | 25 |
-| ladder ×1 | **46.8** | 35 | ~64 |
-| ladder ×2 | **61.7** | 50 | — |
-| ladder ×4 | 66.5 | 67 | 182* |
-| ladder ×8 | **66.6** | 8.5–29 | — |
-| ladder ×16 | **67.1** | 6.8 | — |
-
-\* active-stream convention (sum of live stream rates, not wall aggregate).
-Aggregate convention here = completion tokens ÷ wall clock for the round.
-The 2× GB10 lane collapses beyond ×4; this single-GB10 engine holds ~66–67
-from ×2 through ×16.
-
-Provenance of the comparison rows (public sources, 2026-09-20):
-- MiaAI-Lab ladder: their published **code-mode** table for the 2026-08-31 config
-  (1M ctx, MNBT 2048, MAX_NUM_SEQS 16, gate-v2 512, 50K ctx per lane);
-  https://github.com/MiaAI-Lab/GLM-5.3-Flash-EXL3-2x-DGX-Sparks — their repo
-  notes it as a historical measurement of that configuration. Single-stream code
-  35–44 / prose ~18 from their current README.
-- Single-Spark recipe: the published forum figures for EXL3 2.05bpw + DFlash2
-  K=7 on one GB10 (structured 64 / prose 25 / C4 ~182 active-stream);
-  https://forums.developer.nvidia.com/t/60-tok-s-glm-5-3-flash-on-a-single-dgx-spark/382140
-- This engine's rows: `work/logs/bench-class-k5.{log,json}` (2026-09-20).
+The ladder holds ~66–67 aggregate from ×2 through ×16.
 
 ## K choice (both measured, same serve flags)
 

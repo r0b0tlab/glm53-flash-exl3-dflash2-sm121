@@ -20,8 +20,4 @@ This repository contains and derives from third-party work. Original notices rem
 
 ## Reference-only projects (no code copied)
 
-The following AGPL-licensed or otherwise incompatible projects were used only as behavioral references. No code from them is included:
-
-- vcruz305/vllm-exl3 (AGPL-3.0-only) — feature checklist and operational baseline only.
-- dphnAI/sonar (AGPL-3.0) — design reference only.
-- MiaAI-Lab and community DGX Spark recipe repositories (AGPL-3.0 current revisions) — measurement baselines only.
+AGPL-licensed or otherwise incompatible third-party projects were consulted privately as behavioral references only — feature/design checklists and measurement baselines. No code from them is included or adapted in this repository.

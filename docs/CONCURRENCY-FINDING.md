@@ -49,18 +49,15 @@ flight** (ATS page migration / table walk), while H2D/D2D/event syncs are free.
 
 - capture sizes [1..96] (fixed the boot bug; graphs were not the limiter)
 - `--no-async-scheduling` (removes the kv_lens D2H; curve unchanged)
-- `--max-num-batched-tokens 2048` (the MiaAI recipe default; unchanged)
+- `--max-num-batched-tokens 2048` (a recipe default carried over; unchanged)
 
-## Class comparison (same model, GB10, vLLM + DFlash2)
+## Host-step model check (both on this platform, vLLM + DFlash2)
 
-- Sibling lane (2×GB10, 0.28 overlay): C1 68.4 / C2 124 / C4 214.5 / C6 282.8
-  agg (think-off, K8, code-heavy). Consistent with the same host-step model:
-  ~7 tokens/step × ~100 ms steps at C1, ~6×7 tokens/step at C6.
-- MiaAI (2×GB10, EXL3, K7): ladder ×1 35 / ×2 50 / ×4 67 / ×8 8.5–29 / ×16 6.8;
-  "the interactive knee is ~4 lanes"; speed "set by the drafter's acceptance
-  (code 35–44 solo, prose ~18)".
-- This engine, high-AL workload (repetitive, AL 6.6–7.4): 50.2 tok/s C1 —
-  in-class. Prose AL ≈ 2.65 → C1 ≈ 17–24 and the C2+ plateau at ≈ 38.
+- Our NVFP4 sibling lane (2×GB10, 0.28 overlay): C1 68.4 / C2 124 / C4 214.5 /
+  C6 282.8 agg (think-off, K8, code-heavy). Consistent with the same host-step
+  model: ~7 tokens/step × ~100 ms steps at C1, ~6×7 tokens/step at C6.
+- This engine, high-AL workload (repetitive, AL 6.6–7.4): 50.2 tok/s C1. Prose
+  AL ≈ 2.65 → C1 ≈ 17–24 and the C2+ plateau at ≈ 38.
 
 ## Conclusion
 

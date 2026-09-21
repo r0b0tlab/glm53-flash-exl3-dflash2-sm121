@@ -8,28 +8,16 @@ CUDA kernels + anchored patches + measured receipts.
 
 ## Headline (single GB10, TP=1, temp 0, DFlash2 K=5; 2026-09-20)
 
-| single-stream (median of 5, 2048 cap) | | concurrency (structured, agg tok/s) | |
-|---|---:|---|---:|
-| structured output | **50.2 tok/s** | ×1 | 46.8 |
-| code | **43.4 tok/s** | ×4 | **66.5** |
-| open prose | **19.5 tok/s** | ×16 | **67.1** |
+| single-stream (median of 5, 2048 cap) | tok/s | | concurrency (structured, agg tok/s) | |
+|---|---:|---|---:|---:|
+| structured output | **50.2** | | ×1 | 46.8 |
+| code | **43.4** | | ×4 | **66.5** |
+| open prose | **19.5** | | ×16 | **67.1** |
 
-Context vs the published field (same model, EXL3, DFlash2):
+Full tables, the K=5-vs-K=7 choice and measurement methods:
+[`docs/RESULTS.md`](docs/RESULTS.md).
 
-| | this engine (1× GB10) | MiaAI-Lab (2× GB10, 4bpw) | single-Spark recipe (2.05bpw) |
-|---|---:|---:|---:|
-| code single-stream | **43.4** | 35–44 | — |
-| ladder ×1 | **46.8** | 35 | ~64 |
-| ladder ×4 | 66.5 | 67 | 182* |
-| ladder ×8 | **66.6** | 8.5–29 | — |
-| ladder ×16 | **67.1** | 6.8 | — |
-
-\* active-stream convention. This single-GB10 engine beats the published
-2× GB10 row at ×1/×2/×8/×16 and matches it at ×4. Full tables, the K=5-vs-K=7
-choice and methods: [`docs/RESULTS.md`](docs/RESULTS.md).
-
-The engine climbs from 46.8 to 67.1 aggregate across the lanes while the
-published 2× GB10 lane collapses beyond ×4. Losslessness and acceptance: see
+Losslessness and acceptance: see
 [`docs/M4-RECEIPT.md`](docs/M4-RECEIPT.md) (greedy-exact in-session; spec-vs-AR
 differences are single-token near-tie flips). The measured platform bound
 (vLLM v1 host step; ~2 ms per D2H completion) and the two bugs fixed on the way
