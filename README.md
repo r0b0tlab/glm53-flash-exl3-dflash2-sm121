@@ -131,9 +131,6 @@ telemetry).
 - The concurrency ceiling is the vLLM v1 host step on this platform (measured;
   see the finding doc) — kernels are not the limiter (tensor cores engaged,
   11–13% utilized, memory/issue-bound at these shapes).
-- `pyproject.toml` still carries the `Private :: Do Not Upload` classifier from
-  the pre-publication state; it contradicts the repo being public and should be
-  dropped.
 
 ## Governance
 
@@ -144,4 +141,13 @@ telemetry).
 
 ## License
 
-Our code: MIT (`LICENSE`). Vendored exllamav3 sources: MIT (`vendored/exllamav3/LICENSE`).
+MIT — see [`LICENSE`](LICENSE).
+
+- **Our code:** MIT. `pyproject.toml` declares it as the SPDX expression
+  `license = "MIT"` (PEP 639) and ships both license files via `license-files`.
+- **Vendored EXL3 kernels:** MIT, `vendored/exllamav3/LICENSE`
+  (turboderp-org/exllamav3 v1.5.0 @ `0740edc2`, unmodified subset).
+- **vLLM:** Apache-2.0, consumed as a runtime dependency and not vendored;
+  `patches/vllm/` are diffs against it.
+- Full attribution: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and
+  [`docs/provenance.md`](docs/provenance.md).

@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+# >=77 for PEP 639 support: SPDX `license` string + `license-files`.
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,12 +9,16 @@ version = "0.1.0"
 description = "r0b0tlab vLLM EXL3 serving plugin, optimized for NVIDIA GB10 / SM121"
 requires-python = ">=3.10"
 readme = "README.md"
-license = {text = "MIT"}
+# SPDX expression (PEP 639). Replaces the deprecated `license = {text = ...}`
+# table and the `License ::` classifier, which cannot coexist with it.
+license = "MIT"
+license-files = [
+  "LICENSE",
+  "vendored/exllamav3/LICENSE",
+]
 authors = [{name = "r0b0tlab"}]
 classifiers = [
-  "Private :: Do Not Upload",
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
 ]
 
 [project.entry-points."vllm.general_plugins"]
