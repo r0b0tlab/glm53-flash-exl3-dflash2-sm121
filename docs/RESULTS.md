@@ -82,7 +82,7 @@ SM12X-LLM-BENCH systems lane (report `work/bench/sm12x-systems/`):
 | latency (256-out) | TTFT p50 282 ms, ITL p50 30.7 ms, e2e 31.5 tok/s |
 | concurrency (per-stream p50) | 31.1 / 23.3 / 16.3 / 8.5 tok/s at C1/2/4/8 — aggregate 31.1 / 46.6 / 65.2 / 68.0 |
 | throughput | decode 24.0 tok/s p50 (2048-out ×5); prefill 346 tok/s (~14k prompt) |
-| niah | 5/5 found at the advertised 32768 window — single 8064 / 16128 / 29030 + multi-key 10644 / 21288 |
+| niah | 5/5 found — actual server prompt_tokens: single 4740 / 9428 / 16939, multi-key 6317 / 12510 (nominal 8064/16128/29030 and 10644/21288 labels overestimate depth; the lane builds haystacks with a 4-chars/token estimate) |
 | bfcl lanes | PROTOCOL (env not set — quality carried by the Q200v2 kit instead) |
 | mtp | probe ok (n/a for DFlash2) |
 | telemetry | 832 samples: GPU util p50 96 %, SM clock p50 2463 MHz, temp p50 81 °C, power p50 68.8 W |

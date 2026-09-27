@@ -111,6 +111,16 @@ telemetry).
 - SM12X-LLM-BENCH systems: **complete / publishable** — NIAH 5/5 at the
   advertised 32768 window (incl. multi-key 33/66), concurrency and throughput
   rows, 832-sample telemetry. Full tables in `docs/RESULTS.md`.
+  **Depth correction (2026-09-27):** the SM12X NIAH lane constructs haystacks
+  with a 4-chars/token estimate, so its rows are nominal-depth labels. Actual
+  server `prompt_tokens` were 4,740 / 9,428 / 16,939 (single) and 6,317 /
+  12,510 (multi-key) — all five needles were retrieved, but this is not
+  evidence of retrieval at the nominal depths. Token-exact long-context
+  qualification for this pack now lives in the standalone ExLlamaV3 runtime:
+  [`r0b0tlab/glm53-flash-exl3-exllamav3-gb10`](https://github.com/r0b0tlab/glm53-flash-exl3-exllamav3-gb10)
+  (single-key retrieval verified at 259,993 actual prompt tokens on a
+  262,144-token ExLlamaV3/TabbyAPI serve — separate engine, results do not
+  transfer to this vLLM profile).
 
 ## Status / limits
 
